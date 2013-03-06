@@ -1,7 +1,7 @@
 # Makefile
 # author: dipina@eside.deusto.es
 # g++ -shared  -o TcpListener.o libprueba.so
-CC=g++
+CC=g++ -fPIC
 LDFLAGS=-shared -lm -lpthread 
 
 main: libesidesocket.so libesidethread.so libesidesh.so  #anyadir libesidesqlite.so cuando la creemos
