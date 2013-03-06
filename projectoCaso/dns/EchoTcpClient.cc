@@ -8,7 +8,7 @@ int main() {
 	// MODIFICATION 2.3.3
 		PracticaCaso::TcpClient * client = new PracticaCaso::TcpClient();
 		client->connect("127.0.0.1", 4321);
-		string msg = "¡Hello CASO students!";
+		string msg = "ï¿½Hello CASO students!";
 		client->send(msg);
 		cout << "Message sent: " << msg << endl;
 		msg = client->receive();
@@ -19,12 +19,12 @@ int main() {
 	// MODIFICATION 2.3.5
 	for (int i=0; i<100; i++) {
 		PracticaCaso::TcpClient * client = new PracticaCaso::TcpClient();
-		cout << "Petición: " << i << endl;
+		cout << "Peticiï¿½n: " << i << endl;
 		client->connect("127.0.0.1", 4321);
-		string msg = "¡Hello CASO students!";
+		string msg = "ï¿½Hello CASO students!";
 		client->send(msg);
 		cout << "Message sent: " << msg << endl;
-		msg = client->receive();
+		msg = client->receive(); //nos quedamos esperando...
 		cout << "Message received: " << msg << endl;
 		client->close();	
 		delete client;

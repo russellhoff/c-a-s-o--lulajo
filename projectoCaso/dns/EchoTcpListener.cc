@@ -1,6 +1,9 @@
 // EchoTcpListener.cc
 // author: dipina@eside.deusto.es
 
+/*
+ * el servidor de echotcpclient
+ */
 #include "TcpListener.h"
 #include "EchoServerThread.h"
 

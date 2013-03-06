@@ -18,9 +18,9 @@ namespace PracticaCaso
 			pthread_t thread_id;
 		public:
 			virtual ~Thread() {}
-			virtual void run() = 0;
-			void start();
-			void stop();
+			virtual void run() = 0; //habra que reescribir esta funciona cada vez que implementemos un thread
+			void start(); //nos interesa
+			void stop(); //nos interesa
 	};
 };
 #endif

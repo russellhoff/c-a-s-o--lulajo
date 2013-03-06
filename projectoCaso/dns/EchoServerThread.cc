@@ -1,6 +1,9 @@
 // EchoServerThread.cc
 // author: dipina@eside.deusto.es
 
+/*
+ * para cualquier servidor multihilo: copiar, cambiar nombre y ya esta. Solo sobreescribir el metodo run()
+ */
 #include "EchoServerThread.h"
 
 namespace PracticaCaso
