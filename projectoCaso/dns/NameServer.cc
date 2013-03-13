@@ -9,10 +9,10 @@ extern "C" {
 
 namespace PracticaCaso {
 	NameServer::NameServer(int p, string m, bool leerCache): TcpListener(p) {
-		//cout << "Creating SQLiteMap " << endl;
+		cout << "Creating SQLiteMap " << endl;
 		// Process the contents of the mapping file
-		//this->sqliteMap = new SQLiteMap(m+"_cache.db");
-		//cout << "Creating SQLiteMap!!!" << endl;
+		this->sqliteMap = new SQLiteMap(m+"_cache.db");
+		cout << "Creating SQLiteMap!!!" << endl;
 		this->leerCache = leerCache;
 		cout << "Calling to loadMappings" << endl;
 		this->loadMappings(m);
@@ -202,11 +202,21 @@ void processClientRequest(PracticaCaso::TcpClient *dnsClient, PracticaCaso::Name
 int main(int argc, char** argv) {
 	signal(SIGINT,ctrl_c);
 
-	if (argc != 3) {
+	if (argc != 3 && argc !=4) {
 		usage();
 	}
-
-	PracticaCaso::NameServer nameServer(atoi(argv[1]), (string)argv[2], false);
+	bool leerCache =true;
+	if(){
+		if(string(argv[3]) =="false")
+			leercache=false;
+	} else{
+		if(string(argv[3]) =="true"){
+			leercache=true;
+	}
+	
+	
+	
+	PracticaCaso::NameServer nameServer(atoi(argv[1]), (string)argv[2], leerCache);
 	cout << "NameServer instance: " << endl << nameServer << endl;
 	// MODIFICATION 2.3.6
 	nameServer_pointer = &nameServer;

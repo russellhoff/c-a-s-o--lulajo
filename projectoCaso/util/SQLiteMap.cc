@@ -25,17 +25,20 @@ namespace PracticaCaso {
 		// In the case that the DB does not exist, create it, its structure is given by file KeyValueDB.sql
 		// If a select * from KeyValuePair executed through a sqlite3_get_table does not return SQLITE_OK, it means that the table does not exist, and needs being created
 		// If there are unexpected error exit the program with exit(1)
+	char ** result, *errorMsg;
+	int nrow,ncol;
+	if(sqlite3_get_table(dbh, "select * from kKeyValuePair", &result,&n
+	
 	}
 
 	
 	map<string, string> SQLiteMap::getMap() {
-		// To do
-		return NULL;
+		return dns2IpPortMap;
 	}
 
 
 	string SQLiteMap::get(string key) {
-		// To do
+		map <string,string>::iterator
 		return NULL;
 	}
 
