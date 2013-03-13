@@ -20,7 +20,7 @@ namespace PracticaCaso
 {
 	class SQLiteMap {
 		private:
-			sqlite3 *dbh;;
+			sqlite3 *dbh;
 			string fileName;
 			map<string, string> dns2IpPortMap;
 

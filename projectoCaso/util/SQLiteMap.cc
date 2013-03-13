@@ -4,6 +4,10 @@
 #include "SQLiteMap.h"
 
 namespace PracticaCaso {
+	sqlite3 *db;
+	string fileName;
+	map<string, string> dns2IpPortMap;
+
 	SQLiteMap::SQLiteMap(string fn): fileName(fn), dbh(0) {
 		// Process the contents of the mapping file
 		this->loadMappings(fn);
@@ -25,12 +29,30 @@ namespace PracticaCaso {
 		// In the case that the DB does not exist, create it, its structure is given by file KeyValueDB.sql
 		// If a select * from KeyValuePair executed through a sqlite3_get_table does not return SQLITE_OK, it means that the table does not exist, and needs being created
 		// If there are unexpected error exit the program with exit(1)
-	/*char ** result, *errorMsg;
-	int nrow,ncol;
-	if(sqlite3_get_table(dbh, "select * from kKeyValuePair", &result,&n
-	*/
-	}
 
+		char **result;
+		int nrow;
+		int ncol;
+		char *errorMsg;
+		cout << "Checking if KeyValuePair table already exists ..." << endl;
+		if (sqlite3_get_table(db, "select * from KeyValuePair", &result, &nrow, &ncol, &errorMsg) != SQLITE_OK) {
+		  cerr << errorMsg << endl;
+		  sqlite3_free(errorMsg);
+		  if (sqlite3_get_table(db, "create table KeyValuePair(key_element BLOB NOT NULL PRIMARY KEY, value_element BLOB)", &result, &nrow, &ncol, &errorMsg) != SQLITE_OK) {
+			  cerr << errorMsg << endl;
+			  sqlite3_free(errorMsg);
+			  sqlite3_close(db);
+			  exit(1);
+		  } else {
+			  cout << "Table DnsMap created" << endl;
+			  sqlite3_free_table(result);
+		  }
+		}
+
+
+
+
+	}
 
 	map<string, string> SQLiteMap::getMap() {
 		return dns2IpPortMap;
