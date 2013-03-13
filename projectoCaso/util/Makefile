@@ -4,7 +4,7 @@
 CC=g++ -fPIC
 LDFLAGS=-shared -lm -lpthread 
 
-main: libesidesocket.so libesidethread.so libesidesh.so  #anyadir libesidesqlite.so cuando la creemos
+main: libesidesocket.so libesidethread.so libesidesh.so libesidesqlite.so
 
 
 libesidesocket.so: TcpListener.o
@@ -20,7 +20,7 @@ libesidesh.so: MySh.o popen.o
 	cp libesidesh.so libesidesh.dll
 	
 libesidesqlite.so: SQLiteMap.o
-	$(CC) $(LDFLAGS) SQLiteMap.o -o libesidesqlite.so
+	$(CC) $(LDFLAGS) SQLiteMap.o -lsqlite3 -o libesidesqlite.so
 	cp libesidesqlite.so libesidesqlite.dll
 	
 SQLiteMap.o: SQLiteMap.cc SQLiteMap.h
