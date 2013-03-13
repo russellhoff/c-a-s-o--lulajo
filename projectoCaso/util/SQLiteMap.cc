@@ -2,9 +2,11 @@
 // author: dipina@eside.deusto.es
 // compile: g++ SQLiteMap.cc -lsqlite3 -o SQLiteMap
 #include "SQLiteMap.h"
+#include <cstring>
+#include <string>
 
 namespace PracticaCaso {
-	sqlite3 *db;
+	sqlite3 *dbh;
 	string fileName;
 	map<string, string> dns2IpPortMap;
 
@@ -29,29 +31,30 @@ namespace PracticaCaso {
 		// In the case that the DB does not exist, create it, its structure is given by file KeyValueDB.sql
 		// If a select * from KeyValuePair executed through a sqlite3_get_table does not return SQLITE_OK, it means that the table does not exist, and needs being created
 		// If there are unexpected error exit the program with exit(1)
-
+		fileName=mappingsDBFileName;
 		char **result;
 		int nrow;
 		int ncol;
 		char *errorMsg;
 		cout << "Checking if KeyValuePair table already exists ..." << endl;
-		if (sqlite3_get_table(db, "select * from KeyValuePair", &result, &nrow, &ncol, &errorMsg) != SQLITE_OK) {
+		if (sqlite3_get_table(dbh, "select * from KeyValuePair", &result, &nrow, &ncol, &errorMsg) != SQLITE_OK) {
 		  cerr << errorMsg << endl;
 		  sqlite3_free(errorMsg);
-		  if (sqlite3_get_table(db, "create table KeyValuePair(key_element BLOB NOT NULL PRIMARY KEY, value_element BLOB)", &result, &nrow, &ncol, &errorMsg) != SQLITE_OK) {
+		  if (sqlite3_get_table(dbh, "create table KeyValuePair(key_element BLOB NOT NULL PRIMARY KEY, value_element BLOB)", &result, &nrow, &ncol, &errorMsg) != SQLITE_OK) {
 			  cerr << errorMsg << endl;
 			  sqlite3_free(errorMsg);
-			  sqlite3_close(db);
+			  sqlite3_close(dbh);
 			  exit(1);
 		  } else {
-			  cout << "Table DnsMap created" << endl;
+			  cout << "Table KeyValuePair created" << endl;
 			  sqlite3_free_table(result);
 		  }
 		}
-
-
-
-
+		for(int i =0; i < (nrow+1) * (ncol); i++) {
+			string key =result[i][0];
+			string value =result[i][1];
+			this->set(key,value);
+		}
 	}
 
 	map<string, string> SQLiteMap::getMap() {
@@ -60,17 +63,16 @@ namespace PracticaCaso {
 
 
 	string SQLiteMap::get(string key) {
-		//map <string,string>::iterator
-		return NULL;
+		return dns2IpPortMap [key];
 	}
 
 	void SQLiteMap::set(string mapKey, string mapValue) {
-		// Undertake the update of the STL map and the database. Bear in mind that it there is not an entry with a passed key an INSERT will have to be executed, if there was already such an entry an UPDATE will take place
+		dns2IpPortMap[mapKey]=mapValue;
 	}
 
 
 	void SQLiteMap::close() {
-		// Close the database properly
+		 sqlite3_close(db);
 	}
 
 	ostream & operator << (ostream & os, SQLiteMap &t) {
