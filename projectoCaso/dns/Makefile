@@ -13,7 +13,8 @@ EchoTcpClient: EchoTcpClient.o
 	$(CC) EchoTcpClient.o $(LDFLAGS) -o EchoTcpClient
 
 NameServer: NameServer.o
-	$(CC) NameServer.o $(LDFLAGS) -o NameServer
+	$(CC) NameServer.o $(LDFLAGS) -lesidesqlite -o NameServer #anyadimos la parte significativa de la libreria (esidesqlite)
+															  #ya que la libreria la va a usar libesidesqlite
 
 NameClient: NameClient.o
 	$(CC) NameClient.o $(LDFLAGS) -o NameClient
