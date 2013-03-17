@@ -7,7 +7,6 @@
 
 namespace PracticaCaso {
 	sqlite3 *dbh;
-	string fileName;
 	map<string, string> dns2IpPortMap;
 
 	SQLiteMap::SQLiteMap(string fn): fileName(fn), dbh(0) {
@@ -31,30 +30,54 @@ namespace PracticaCaso {
 		// In the case that the DB does not exist, create it, its structure is given by file KeyValueDB.sql
 		// If a select * from KeyValuePair executed through a sqlite3_get_table does not return SQLITE_OK, it means that the table does not exist, and needs being created
 		// If there are unexpected error exit the program with exit(1)
-		fileName=mappingsDBFileName;
+
+		//TENEMOS QUE ABRIR LA BD ANTES DE COMPROBAR SI
+		//EXISTE LA TABLA HAY K ABRIRLA EN 'dbh' -->
+		cout << "Opening BD ..." << endl;
+		if (sqlite3_open(mappingsDBFileName.c_str(), &dbh) != SQLITE_OK) {
+			cerr << sqlite3_errmsg(dbh) << endl;
+			sqlite3_close(dbh);
+			exit(1);
+		}
+		// <-- HASTA AQUÍ
+
 		char **result;
 		int nrow;
 		int ncol;
 		char *errorMsg;
+
+		//COMPROBAMOS SI LA TABLA EXISTE
 		cout << "Checking if KeyValuePair table already exists ..." << endl;
 		if (sqlite3_get_table(dbh, "select * from KeyValuePair", &result, &nrow, &ncol, &errorMsg) != SQLITE_OK) {
 		  cerr << errorMsg << endl;
 		  sqlite3_free(errorMsg);
+		  //SI LA TABLA NO EXISTE LA CREAMOS
 		  if (sqlite3_get_table(dbh, "create table KeyValuePair(key_element BLOB NOT NULL PRIMARY KEY, value_element BLOB)", &result, &nrow, &ncol, &errorMsg) != SQLITE_OK) {
 			  cerr << errorMsg << endl;
 			  sqlite3_free(errorMsg);
 			  sqlite3_close(dbh);
 			  exit(1);
-		  } else {
-			  cout << "Table KeyValuePair created" << endl;
-			  sqlite3_free_table(result);
 		  }
+		  cout << "Table KeyValuePair created" << endl;
+		  sqlite3_free_table(result);
 		}
-		for(int i =0; i < (nrow+1) * (ncol); i++) {
-			string key =result[i][0];
-			string value =result[i][1];
-			this->set(key,value);
+
+		//cogemos los datos de la tabla
+		cout << "Loading data into cache" << endl;
+		if (sqlite3_get_table(dbh, "select * from KeyValuePair", &result, &nrow, &ncol, &errorMsg) != SQLITE_OK) {
+			cerr << errorMsg << endl;
+			sqlite3_free(errorMsg);
+			sqlite3_close(dbh);
+			exit(1);
 		}
+
+		//los datos de result los metemos en la cache ¿cabeceras?
+		for (int i=0; i <= nrow; i++) {
+			dns2IpPortMap[result[i*ncol]] = result[i*ncol + 1];
+		}
+
+		//cerramos la BD
+		sqlite3_free_table(result);
 	}
 
 	map<string, string> SQLiteMap::getMap() {
@@ -68,11 +91,12 @@ namespace PracticaCaso {
 
 	void SQLiteMap::set(string mapKey, string mapValue) {
 		dns2IpPortMap[mapKey]=mapValue;
+		//hay que meterlo en la BD también
 	}
 
 
 	void SQLiteMap::close() {
-		 sqlite3_close(db);
+		sqlite3_close(dbh);
 	}
 
 	ostream & operator << (ostream & os, SQLiteMap &t) {
