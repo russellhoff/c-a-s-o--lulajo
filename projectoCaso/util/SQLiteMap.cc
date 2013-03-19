@@ -6,10 +6,8 @@
 #include <string>
 
 namespace PracticaCaso {
-	sqlite3 *dbh;
-	map<string, string> dns2IpPortMap;
 
-	SQLiteMap::SQLiteMap(string fn): fileName(fn), dbh(0) {
+	SQLiteMap::SQLiteMap(string fn): fileName(fn), dbh(0), dns2IpPortMap()  {
 		// Process the contents of the mapping file
 		this->loadMappings(fn);
 	}
@@ -51,26 +49,31 @@ namespace PracticaCaso {
 		if (sqlite3_get_table(dbh, "select * from KeyValuePair", &result, &nrow, &ncol, &errorMsg) != SQLITE_OK) {
 		  cerr << errorMsg << endl;
 		  sqlite3_free(errorMsg);
+		  if(&nrow==0)
 		  //SI LA TABLA NO EXISTE LA CREAMOS
 		  if (sqlite3_get_table(dbh, "create table KeyValuePair(key_element BLOB NOT NULL PRIMARY KEY, value_element BLOB)", &result, &nrow, &ncol, &errorMsg) != SQLITE_OK) {
 			  cerr << errorMsg << endl;
 			  sqlite3_free(errorMsg);
 			  sqlite3_close(dbh);
 			  exit(1);
+		  }else{
+			  cout << "Tabla creada" << endl;
 		  }
 		  cout << "Table KeyValuePair created" << endl;
 		  sqlite3_free_table(result);
+		  return;
+
 		}
 
 		//cogemos los datos de la tabla
 		cout << "Loading data into cache" << endl;
-		if (sqlite3_get_table(dbh, "select * from KeyValuePair", &result, &nrow, &ncol, &errorMsg) != SQLITE_OK) {
+		if (sqlite3_get_table(dbh, "select * from KeyValuePair;", &result, &nrow, &ncol, &errorMsg) != SQLITE_OK) {
 			cerr << errorMsg << endl;
 			sqlite3_free(errorMsg);
 			sqlite3_close(dbh);
 			exit(1);
 		}
-
+		cout << "llego" << endl;
 		//los datos de result los metemos en la cache ¿cabeceras?
 		for (int i=0; i <= nrow; i++) {
 			dns2IpPortMap[result[i*ncol]] = result[i*ncol + 1];
@@ -90,8 +93,49 @@ namespace PracticaCaso {
 	}
 
 	void SQLiteMap::set(string mapKey, string mapValue) {
-		dns2IpPortMap[mapKey]=mapValue;
-		//hay que meterlo en la BD también
+		char **result;
+		int nrow, ncol;
+		char *errorMsg;
+		string query = "update KeyValuePair set value_element = " + mapValue + "  where key_element = " + mapKey;
+
+		if (dns2IpPortMap.find(mapKey) != dns2IpPortMap.end()) {
+				if (sqlite3_get_table(dbh, query.c_str(), &result, &nrow, &ncol, &errorMsg) != SQLITE_OK) {
+					cout << "fallo1" << endl;
+
+						cerr << errorMsg << endl;
+						sqlite3_free(errorMsg);
+						sqlite3_close(dbh);
+						exit(1);
+				}else{
+					cout << "ok. " << endl;
+
+				}
+
+				cout << "Row updated." << endl;
+				sqlite3_free_table(result);
+				return;
+		}
+
+
+		dns2IpPortMap[mapKey]= mapValue;
+		query = "insert into KeyValuePair values('" + mapKey + "', '" + mapValue + "')";
+
+		if (sqlite3_get_table(dbh, query.c_str(), &result, &nrow, &ncol, &errorMsg) != SQLITE_OK) {
+			//falla aquí xq no existe la tabla
+			cout << "fallo2" << endl;
+
+				cerr << errorMsg << endl;
+				sqlite3_free(errorMsg);
+				sqlite3_close(dbh);
+				exit(1);
+		}else{
+			cout << "ok2. " << endl;
+
+
+		}
+
+		cout << "Row created. " << endl;
+		sqlite3_free_table(result);
 	}
 
 
