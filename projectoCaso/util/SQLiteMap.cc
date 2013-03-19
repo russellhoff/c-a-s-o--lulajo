@@ -49,13 +49,11 @@ namespace PracticaCaso {
 		if (sqlite3_get_table(dbh, "select * from KeyValuePair", &result, &nrow, &ncol, &errorMsg) != SQLITE_OK) {
 		  cerr << errorMsg << endl;
 		  sqlite3_free(errorMsg);
-		  if(&nrow==0)
 		  //SI LA TABLA NO EXISTE LA CREAMOS
 		  if (sqlite3_get_table(dbh, "create table KeyValuePair(key_element BLOB NOT NULL PRIMARY KEY, value_element BLOB)", &result, &nrow, &ncol, &errorMsg) != SQLITE_OK) {
 			  cerr << errorMsg << endl;
 			  sqlite3_free(errorMsg);
-			  sqlite3_close(dbh);
-			  exit(1);
+			  this->close();
 		  }else{
 			  cout << "Tabla creada" << endl;
 		  }
@@ -70,8 +68,7 @@ namespace PracticaCaso {
 		if (sqlite3_get_table(dbh, "select * from KeyValuePair;", &result, &nrow, &ncol, &errorMsg) != SQLITE_OK) {
 			cerr << errorMsg << endl;
 			sqlite3_free(errorMsg);
-			sqlite3_close(dbh);
-			exit(1);
+
 		}
 		cout << "llego" << endl;
 		//los datos de result los metemos en la cache ¿cabeceras?
