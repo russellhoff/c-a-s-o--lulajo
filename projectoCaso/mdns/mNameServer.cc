@@ -4,11 +4,12 @@
 
 
 #include "mNameServer.h"
+#include "sqliteMap.h"
 
 #define MSGBUFSIZE 1024
 
 extern "C" {
-	#include </usr/include/signal.h>
+	#include <signal.h>
 }
 
 namespace PracticaCaso {
@@ -185,40 +186,74 @@ namespace PracticaCaso {
 	void mNameServer::mdns_management(string cmd, string payload, string code) {
 		map<string, string>::iterator p;
 		string dnsValue;
-		// Begin management utility function.
+		// HECHO. COMPARA EL COMANDO Y ACTUA DEPENDIENDO SI ES REQUEST O RESPONSE
+		if( strcmp(cmd.c_str(), MDNS_REQUEST)== 0)
+		{
+			this->mdns_manage_request(cmd, payload, code);
+		}
+		else
+		{
+			this->mdns_manage_response(cmd, payload, code);
+		}
 
 	}
 
 	void mNameServer::mdns_manage_response(string cmd, string payload, string code) {
-	cout << "mdns_management: MDNS_RESPONSE received" << endl;
+		cout << "mdns_management: MDNS_RESPONSE received" << endl;
 
-	// Check if there is any pending query.
-	// The arrived MDNS_RESPONSE may be addressed to me.
-	// And then check if the MDNS_RESPONSE corresponds to pendingQuery. Use random code.
-	// satisfiedQuery establishes a default FIRST-FIT criterion. Other methods are welcome. */
-	// Yes, there was a MDNS_RESPONSE, but not for me. This MDNS_RESPONSE can flow, or it  can crash... be the mdns_response, my friend. 
-	// It they don't come to me, snoopy cache can be implemented for efficiency. 
-	// Warning! Man-in-the-middle poisoning attacks enabling.
-	// Query cache
-	// More MDNS_RESPONSES can come to me, or not to me. First approach, ignore them.
-	// If they come to me, combination methods can be accomplished for completion.
-	// It they don't come to me, snoopy cache can be implemented for efficiency. 
-	// Warning! Man-in-the-middle poisoning attacks enabling.
-	// Query cache
+		// Check if there is any pending query.
+		// The arrived MDNS_RESPONSE may be addressed to me.
+		// And then check if the MDNS_RESPONSE corresponds to pendingQuery. Use random code.
+		// satisfiedQuery establishes a default FIRST-FIT criterion. Other methods are welcome. */
+		// Yes, there was a MDNS_RESPONSE, but not for me. This MDNS_RESPONSE can flow, or it  can crash... be the mdns_response, my friend.
+		// It they don't come to me, snoopy cache can be implemented for efficiency.
+		// Warning! Man-in-the-middle poisoning attacks enabling.
+		// Query cache
+		// More MDNS_RESPONSES can come to me, or not to me. First approach, ignore them.
+		// If they come to me, combination methods can be accomplished for completion.
+		// It they don't come to me, snoopy cache can be implemented for efficiency.
+		// Warning! Man-in-the-middle poisoning attacks enabling.
+		// Query cache
 
+		//HECHO. COMPRUEBA EL CODIGO Y SI ESTA YA RESUELTA LA PETICION
+		 if((strcmp(this->pendingQueryCode.c_str(), code.c_str()) == 0) && !(this->satisfiedQuery)) {
+
+			//GUARDAMOS LA RESPUESTA QUE HEMOS RECIBIDO
+			this->dns2IpPortMap[pendingQuery] = payload;
+			this->sqliteMap->set(pendingQuery, payload);
+			this->satisfiedQuery = true;
+			this->solvedQuery = payload;
+			this->pendingQuery = "";
+			this->pendingQueryCode = "";
+
+		} else {
+			//NO HACEMOS NADA
+		}
 	}
 			
 	void mNameServer::mdns_manage_request(string cmd, string payload, string code) {
-	map<string, string>::iterator p;
-	string dnsValue;
+		map<string, string>::iterator p;
+		string dnsValue;
 
-	// One MDNS_REQUEST received: you must lookup your table and answer or not.
-	// Lookup the local table. RFC doesn't recommend recursive looking up.
-	// If the requested dnsName is in the local table, response. If don't, not to.
-	// Send the good MDNS_RESPONSE.
-	// If the requested dnsName is not in the local table, don't do anything.
-	// It can be interesting to use a MDNS_ERROR RESPONSE, but with some overhead.	
+		// One MDNS_REQUEST received: you must lookup your table and answer or not.
+		// Lookup the local table. RFC doesn't recommend recursive looking up.
+		// If the requested dnsName is in the local table, response. If don't, not to.
+		// Send the good MDNS_RESPONSE.
+		// If the requested dnsName is not in the local table, don't do anything.
+		// It can be interesting to use a MDNS_ERROR RESPONSE, but with some overhead.
 
+		//COMPROBAMOS SI EL DNSNAME ESTA EN EL MAPA
+		map<string, string>::const_iterator iter;
+		iter = this->dns2IpPortMap.find(payload);
+		if (iter != this->dns2IpPortMap.end())	{
+			//EXISTE, ENVIAMOS RESPUESTA
+			ostringstream query;
+			query << MDNS_RESPONSE << " " << iter->second << " " << code;
+			cout << "Sending  response: " << query.str() << " " << endl;
+			this->queryWrapper->send(query.str());
+		} else {
+			//NO EXISTE
+		}
 	}
 
 	string mNameServer::delegatemDNSCommunity(string dnsName) {
