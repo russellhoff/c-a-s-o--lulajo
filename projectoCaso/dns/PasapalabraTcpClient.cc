@@ -10,13 +10,20 @@ void usage() {
 int main() {
 	PracticaCaso::TcpClient * client = new PracticaCaso::TcpClient();
 	client->connect("127.0.0.1", 4321);
-
+	cout << endl;
+	cout << "*************  BIENVENIDO A PASAPALABRA  *************" <<endl;
+	cout << "Se van a ofrecer varias definiciones y debes responder la palabra definida (en mayusculas)"<<endl;
 	bool acabado=false;
+	string mensaje;
 	string pregunta;
+	string solucion;
 	string respuesta;
 	int var;
 	for (var = 0; var <=4; ++var) {
-		pregunta = client->receive();
+		mensaje = client->receive();
+		pregunta = mensaje.substr(mensaje.find("*")+1, mensaje.length());
+		solucion = mensaje.substr(0,mensaje.find("*"));
+		cout << solucion <<endl;
 		cout << endl;
 		cout << pregunta << endl;
 		cout << "Respuesta: ";
