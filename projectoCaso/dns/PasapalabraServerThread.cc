@@ -41,6 +41,8 @@ namespace PracticaCaso
 		respondidas[4]=false;
 
 		//ENVIAMOS LA PREGUNTA
+		int acertadas=0;
+		int falladas=0;
 		int var;
 		string solucion="";
 		for (var = 0; var <=4; ++var) {
@@ -51,9 +53,11 @@ namespace PracticaCaso
 
 			if (respuesta.compare(respuestas[var].c_str())){
 				solucion="HAS ACERTADO";
+				acertadas++;
 				(this->client)->send(solucion);
 			}else{
 				solucion="";
+				falladas++;
 				solucion << "HAS FALLADO. La respuesta correcta era: '" << respuestas[var] << "'";
 				(this->client)->send(solucion);
 			}
