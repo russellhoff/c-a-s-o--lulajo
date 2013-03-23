@@ -6,16 +6,10 @@ namespace PracticaCaso
 		delete this->client;
 	}
 
-	PasapalabraServerThread::PasapalabraServerThread(TcpClient* c) {
-		this->client =c;
-
-	}
-
 	void PasapalabraServerThread::run() {
-
-		string preguntas[];
-		string respuestas[];
-		bool respondidas[];
+		string preguntas[4];
+		string respuestas[4];
+		bool respondidas[4];
 
 		//INICIALIZAMOS LOS ARRAYS
 		preguntas[0]="EMPIEZA POR LA A ... Tipo de animal que es un gorrión.";
@@ -35,7 +29,6 @@ namespace PracticaCaso
 		respuestas[3]="Dedo";
 		respondidas[3]=false;
 
-
 		preguntas[4]="EMPIEZA POR LA E ... Desviación del alineamiento de un ojo respecto al otro.";
 		respuestas[4]="Estrabismo";
 		respondidas[4]=false;
@@ -45,6 +38,9 @@ namespace PracticaCaso
 		int falladas=0;
 		int var;
 		string solucion="";
+		cout << "FUNCIONA" <<endl;
+
+
 		for (var = 0; var <=4; ++var) {
 			(this->client)->send(preguntas[var]);
 			cout << "PREGUNTA ENVIADA" << var << endl;
@@ -58,7 +54,7 @@ namespace PracticaCaso
 			}else{
 				solucion="";
 				falladas++;
-				solucion << "HAS FALLADO. La respuesta correcta era: '" << respuestas[var] << "'";
+				solucion = "HAS FALLADO. La respuesta correcta era: " +respuestas[var];
 				(this->client)->send(solucion);
 			}
 		}

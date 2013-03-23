@@ -4,7 +4,7 @@ CC=g++
 LDFLAGS=-L../util -lm -lpthread -lesidesocket -lesidethread 
 INCLUDE=-I../util
 
-main: EchoTcpListener EchoTcpClient NameServer NameClient
+main: EchoTcpListener EchoTcpClient NameServer NameClient PasapalabraTcpListener PasapalabraTcpClient
 
 EchoTcpListener: EchoServerThread.o EchoTcpListener.o
 	$(CC) EchoServerThread.o EchoTcpListener.o $(LDFLAGS) -o EchoTcpListener
@@ -13,8 +13,7 @@ EchoTcpClient: EchoTcpClient.o
 	$(CC) EchoTcpClient.o $(LDFLAGS) -o EchoTcpClient
 
 NameServer: NameServer.o
-	$(CC) NameServer.o $(LDFLAGS) -lesidesqlite -o NameServer #anyadimos la parte significativa de la libreria (esidesqlite)
-															  #ya que la libreria la va a usar libesidesqlite
+	$(CC) NameServer.o $(LDFLAGS) -lesidesqlite -o NameServer
 
 NameClient: NameClient.o
 	$(CC) NameClient.o $(LDFLAGS) -o NameClient
@@ -34,7 +33,23 @@ NameServer.o: NameServer.cc NameServer.h
 NameClient.o: NameClient.cc 
 	$(CC) $(INCLUDE) -c NameClient.cc
 
+PasapalabraTcpListener: PasapalabraServerThread.o PasapalabraTcpListener.o
+	$(CC) PasapalabraServerThread.o PasapalabraTcpListener.o $(LDFLAGS) -o PasapalabraTcpListener
+
+PasapalabraTcpClient: PasapalabraTcpClient.o
+	$(CC) PasapalabraTcpClient.o $(LDFLAGS) -o PasapalabraTcpClient
+
+PasapalabraServerThread.o: PasapalabraServerThread.cc PasapalabraServerThread.h
+	$(CC) $(INCLUDE) -c PasapalabraServerThread.cc
+
+PasapalabraTcpListener.o: PasapalabraTcpListener.cc
+	$(CC) $(INCLUDE) -c PasapalabraTcpListener.cc
+
+PasapalabraTcpClient.o: PasapalabraTcpClient.cc
+	$(CC) $(INCLUDE) -c PasapalabraTcpClient.cc
+
+
 clean:
 	rm *.o
-	rm EchoTcpListener EchoTcpClient NameServer NameClient
+	rm EchoTcpListener EchoTcpClient NameServer NameClient PasapalabraTcpListener PasapalabraTcpClient
 	rm *.exe

@@ -26,7 +26,7 @@ int main() {
 
 	while (true) {
 		PracticaCaso::TcpClient* client = listener.acceptTcpClient();
-		PracticaCaso::EchoServerThread* t = new PracticaCaso::EchoServerThread(client);
+		PracticaCaso::PasapalabraServerThread* t = new PracticaCaso::PasapalabraServerThread(client);
 		t->start();
 	}
 
