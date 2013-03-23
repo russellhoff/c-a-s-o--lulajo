@@ -31,55 +31,26 @@ namespace PracticaCaso
 		int acertadas=0;
 		int falladas=0;
 		int var;
-		string pregunta = "";
-		string respuestaJugador = "";
-		string envioAJugador = "";
-		time_t starting_point;
-		time_t now;
+		string solucion="";
 		for (var = 0; var <=4; ++var) {
-
-			pregunta =preguntas[var].c_str();
-			//envioAJugador = "Tienes 15 segundos para responder a la siguiente pregunta: ";
-			(this->client)->send(envioAJugador + "*" + pregunta);
-
-			/*
-			 * Esto es un tiempo límite para el cliente: 15 segundos máximo para responder:
-			 */
-			//Pillamos el timestamp de ahora:
-			time(&starting_point);//lo mismo que hacer now = time(NULL);
-			now = starting_point; //inicializamos el tiempo de la vuelta.
-			while( difftime(starting_point, now) <= 15 ){
-				//Cada vez que pasemos una vuelta pillamos el tiempo y lo comparamos para
-				//saber si han pasado 15 segundos
-				respuestaJugador=(this->client)->receive();
-				time(&now);
-			}
-
-			//Almacenamos la solución a la pregunta
-			string sol =respuestas[var].c_str();
-
-			//Si se ha pasado el tiempo... OOOOH!
-			if( difftime(starting_point, now) > 15 ){
-				envioAJugador="";
-				falladas++;
-				envioAJugador = "SE TE HA AGOTADO EL TIEMPO. La respuesta correcta era: " + sol + ".";
+			string pregunta =preguntas[var].c_str();
+			(this->client)->send(solucion+"*"+pregunta);
+			string respuesta=(this->client)->receive();
+			if (!strcasecmp(respuestas[var].c_str(), respuesta.c_str())){
+				solucion="RESPUESTA CORRECTA!!";
+				acertadas++;
 			}else{
-				if (!respuestaJugador.compare(respuestas[var].c_str())){
-					envioAJugador="RESPUESTA CORRECTA!!";
-					acertadas++;
-				}else{
-					envioAJugador="";
-					falladas++;
-					envioAJugador = "HAS FALLADO. La respuesta correcta era: " + sol + ".";
-				}
+				solucion="";
+				falladas++;
+				string sol =respuestas[var].c_str();
+				solucion = "HAS FALLADO. La respuesta correcta era: "+sol+ ".";
 			}
-			(this->client)->send(envioAJugador);
 		}
 		stringstream stream,stream2;
 		stream << falladas;
 		stream2 << acertadas;
-		envioAJugador = "PREGUNTAS ACERTADAS: " + stream2.str() + " * PREGUNTAS FALLADAS: " + stream.str();
-		(this->client)->send("EL JUEGO HA ACABADO" + envioAJugador);
+		solucion="PREGUNTAS ACERTADAS: "+stream2.str()+" * PREGUNTAS FALLADAS: "+stream.str();
+		(this->client)->send("EL JUEGO HA ACABADO"+solucion);
 		(this->client)->close();
 	}
 }
