@@ -1,5 +1,4 @@
-// EchoTcpClient.cc
-// author: dipina@eside.deusto.es
+// PasapalabraTcpClient.cc
 
 #include "TcpListener.h"
 
@@ -8,30 +7,25 @@ void usage() {
 	exit(1);
 }
 
-int main(int argc, char** argv) {
-
-	if (argc != 2) {
-		usage();
-	}
-
-	PracticaCaso::TcpClient client;
-	client.connect("127.0.0.1", atoi(argv[1]));
+int main() {
+	PracticaCaso::TcpClient * client = new PracticaCaso::TcpClient();
+	client->connect("127.0.0.1", 4321);
 
 	bool acabado=false;
 	string pregunta;
 	string respuesta;
-	while (!acabado){
-		cout << "LLEGO" <<endl;
-		pregunta = client.receive();
-		cout << pregunta <<endl;
-		if(strcmp(pregunta.c_str(),"EL JUEGO HA ACABADO")){
-			acabado=true;
-		}else{
+	while (!acabado)	{
+		pregunta = client->receive();
+		if (!strcmp(pregunta.c_str(),"EL JUEGO HA ACABADO")) {
+			acabado = true;
+		} else {
+			cout << endl;
 			cout << pregunta << endl;
+			cout << "Respuesta: ";
 			cin >> respuesta;
-			client.send(respuesta);
+			client->send(respuesta);
 		}
 	}
-
-	client.close();
+	client->close();
+	delete client;
 }

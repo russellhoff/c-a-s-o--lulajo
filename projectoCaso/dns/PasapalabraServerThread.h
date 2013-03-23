@@ -1,7 +1,7 @@
-// EchoServerThread.h
+// PasapalabraServerThread.h
 // author: dipina@eside.deusto.es
-#ifndef __ECHOSERVERTHREAD_H
-#define __ECHOSERVERTHREAD_H
+#ifndef __PASAPALABRASERVERTHREAD_H
+#define __PASAPALABRASERVERTHREAD_H
 
 #include "Thread.h"
 #include "TcpListener.h"
