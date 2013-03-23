@@ -14,18 +14,25 @@ int main() {
 	bool acabado=false;
 	string pregunta;
 	string respuesta;
-	while (!acabado)	{
+	int var;
+	for (var = 0; var <=4; ++var) {
 		pregunta = client->receive();
-		if (!strcmp(pregunta.c_str(),"EL JUEGO HA ACABADO")) {
-			acabado = true;
-		} else {
-			cout << endl;
-			cout << pregunta << endl;
-			cout << "Respuesta: ";
-			cin >> respuesta;
-			client->send(respuesta);
-		}
+		cout << endl;
+		cout << pregunta << endl;
+		cout << "Respuesta: ";
+		cin >> respuesta;
+		client->send(respuesta);
 	}
+	pregunta = client->receive();
+	int final=pregunta.find("EL JUEGO HA ACABADO");
+	cout << endl;
+	cout << pregunta.substr(0,final)<< endl;
+	cout << endl;
+	cout <<"------------- EL JUEGO HA ACABADO --------------"<< endl;
+	cout << endl;
+
+	cout << pregunta.substr(final+19,pregunta.length()) << endl;
+
 	client->close();
 	delete client;
 }

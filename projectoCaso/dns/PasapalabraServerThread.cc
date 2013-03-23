@@ -1,5 +1,6 @@
 #include "PasapalabraServerThread.h"
-
+#include <stdio.h>
+#include <stdlib.h>
 namespace PracticaCaso
 {
 	PasapalabraServerThread::~PasapalabraServerThread() {
@@ -44,11 +45,13 @@ namespace PracticaCaso
 				solucion="";
 				falladas++;
 				string sol =respuestas[var].c_str();
-				solucion = "HAS FALLADO. La respuesta correcta era: "+sol+ ". ";
+				solucion = "HAS FALLADO. La respuesta correcta era: "+sol+ ".";
 				(this->client)->send(solucion);
 			}
 		}
 		(this->client)->send("EL JUEGO HA ACABADO");
+		solucion="ACERTADAS: ** FALLADAS: ";
+		(this->client)->send(solucion);
 		(this->client)->close();
 	}
 }
