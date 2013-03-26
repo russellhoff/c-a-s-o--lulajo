@@ -12,7 +12,7 @@ int main() {
 	client->connect("127.0.0.1", 4321);
 	cout << endl;
 	cout << "*************  BIENVENIDO A PASAPALABRA  *************" <<endl;
-	cout << "Se van a ofrecer varias definiciones y debes responder la palabra definida (en mayusculas).\nTendrás 15 segundos para responder cada pregunta, ¡así que date prisa!\n"<<endl;
+	cout << "Se van a ofrecer varias definiciones y debes responder la palabra definida."<<endl;
 	bool acabado=false;
 	string mensaje;
 	string pregunta;

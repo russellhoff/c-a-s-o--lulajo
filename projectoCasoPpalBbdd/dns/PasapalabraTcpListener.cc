@@ -11,7 +11,7 @@ extern "C" {
 PracticaCaso::TcpListener * listener_pointer;
 
 void usage(){
-	cout << "./PasapalabraTcpListener pasapalabra_db.db" << endl;
+	cout << "./PasapalabraTcpListener pasapalabra_db" << endl;
 }
 
 void ctrl_c(int)
@@ -21,11 +21,7 @@ void ctrl_c(int)
 }
 
 
-int main(int argc, char** argv) {
-
-	if( argc < 1 || argc > 1 ){
-		usage();
-	}
+int main() {
 
 	signal(SIGINT,ctrl_c);
 	PracticaCaso::TcpListener listener(4321);
@@ -35,10 +31,11 @@ int main(int argc, char** argv) {
 
 	while (true) {
 		PracticaCaso::TcpClient* client = listener.acceptTcpClient();
-		PracticaCaso::PasapalabraServerThread* t = new PracticaCaso::PasapalabraServerThread(client,string(argv[0]));
+		PracticaCaso::PasapalabraServerThread* t = new PracticaCaso::PasapalabraServerThread(client,"pasapalabra_db.db");
 		t->start();
 	}
 
 	cout << "Finishing server ..." << endl;
 	listener.stop();
+
 }

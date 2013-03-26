@@ -37,7 +37,7 @@ namespace PracticaCaso {
 			sqlite3_close(dbh);
 			exit(1);
 		}
-		// <-- HASTA AQUÍ
+		// <-- HASTA AQUï¿½
 
 		char **result;
 		int nrow;
@@ -71,7 +71,7 @@ namespace PracticaCaso {
 
 		}
 		cout << "llego" << endl;
-		//los datos de result los metemos en la cache ¿cabeceras?
+		//los datos de result los metemos en la cache ï¿½cabeceras?
 		for (int i=0; i <= nrow; i++) {
 			dns2IpPortMap[result[i*ncol]] = result[i*ncol + 1];
 		}
@@ -118,7 +118,7 @@ namespace PracticaCaso {
 		query = "insert into KeyValuePair values('" + mapKey + "', '" + mapValue + "')";
 
 		if (sqlite3_get_table(dbh, query.c_str(), &result, &nrow, &ncol, &errorMsg) != SQLITE_OK) {
-			//falla aquí xq no existe la tabla
+			//falla aquï¿½ xq no existe la tabla
 			cout << "fallo2" << endl;
 
 				cerr << errorMsg << endl;
@@ -150,58 +150,3 @@ namespace PracticaCaso {
 		return os;
 	}
 }
-
-
-/*
-// global variable
-PracticaCaso::SQLiteMap * SQLiteMap_pointer;
-
-// function called when CTRL-C is pressed
-void ctrl_c(int)
-{
-    printf("\nCTRL-C was pressed...\n");
-	delete SQLiteMap_pointer;
-}
-
-
-void usage() {
-	cout << "Usage: SQLiteMap <name-mappings-db-file>" << endl;
-	exit(1);
-}
-
-int main(int argc, char** argv) {
-	signal(SIGINT,ctrl_c);
-
-	if (argc != 2) {
-		usage();
-	}
-
-	PracticaCaso::SQLiteMap * SQLiteMap = new PracticaCaso::SQLiteMap((string)argv[1]);
-	cout << "SQLiteMap instance: " << endl << SQLiteMap << endl;
-	//SQLiteMap_pointer = &SQLiteMap;
-	SQLiteMap_pointer = SQLiteMap;
-
-	//SQLiteMap.set("saludo", "hola");
-	//SQLiteMap.set("despedida", "adios");
-	SQLiteMap->set("saludo", "hola");
-	SQLiteMap->set("despedida", "adios");
-
-	//cout << "SQLiteMap[\"saludo\"] = " << SQLiteMap.get("saludo") << endl;
-	//cout << "SQLiteMap[\"despedida\"] = " << SQLiteMap.get("despedida") << endl;
-	cout << "SQLiteMap[\"saludo\"] = " << SQLiteMap->get("saludo") << endl;
-	cout << "SQLiteMap[\"despedida\"] = " << SQLiteMap->get("despedida") << endl;
-
-	cout << "SQLiteMap instance after 2 sets: " << endl << *SQLiteMap << endl;
-
-	//map<string, string> savedSQLiteMap = SQLiteMap.getMap();
-	map<string, string> savedSQLiteMap = SQLiteMap->getMap();
-	cout << "Recuperado el mapa" << endl;
-	typedef map<string, string>::const_iterator CI;
-	for (CI p = savedSQLiteMap.begin(); p != savedSQLiteMap.end(); ++p) {
-		cout << "dns2IpPortMap[" << p->first << "] = " << p->second << endl;
-	}
-	
-	delete SQLiteMap_pointer;
-}
-*/
-
