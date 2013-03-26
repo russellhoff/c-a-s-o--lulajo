@@ -23,8 +23,8 @@ int main() {
 		mensaje = client->receive();
 		pregunta = mensaje.substr(mensaje.find("*")+1, mensaje.length());
 		solucion = mensaje.substr(0,mensaje.find("*"));
-		cout << solucion <<endl;
-		cout << endl;
+		//cout << solucion <<endl;
+		//cout << endl;
 		cout << pregunta << endl;
 		cout << "Respuesta: ";
 		cin >> respuesta;

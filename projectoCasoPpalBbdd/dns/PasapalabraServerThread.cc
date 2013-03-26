@@ -28,39 +28,18 @@ namespace PracticaCaso
 	}
 
 	void PasapalabraServerThread::run() {
-		string preguntas[5];
-		string respuestas[5];
-		string letras[5];
+
+		int cant_letras = 5;
+
+		string preguntas[cant_letras];
+		string respuestas[cant_letras];
+		string letras[cant_letras];
 		letras[0] = "A";
 		letras[1] = "B";
 		letras[2] = "C";
 		letras[3] = "D";
 		letras[4] = "E";
 
-		/*int vars;
-		string preg = "";
-		string resp = "";
-		for (vars = 0; vars < 5; ++vars) {
-			sqliteMapPasapalabra->get(letras[vars]);
-			preguntas[vars] = preg;
-			respuestas[vars] = resp;
-		}*/
-
-		/*//INICIALIZAMOS LOS ARRAYS
-		preguntas[0]="EMPIEZA POR LA A ... Tipo de animal que es una gaviota.";
-		respuestas[0]="AVE";
-
-		preguntas[1]="EMPIEZA POR LA B ... Medio de transporte que navega por el mar.";
-		respuestas[1]="BARCO";
-
-		preguntas[2]="EMPIEZA POR LA C ... Articulacion situada entre el brazo y antebrazo.";
-		respuestas[2]="CODO";
-
-		preguntas[3]="EMPIEZA POR LA D ... Tenemos 5 en cada mano (singular).";
-		respuestas[3]="DEDO";
-
-		preguntas[4]="EMPIEZA POR LA E ... Desviacion del alineamiento de un ojo respecto al otro.";
-		respuestas[4]="ESTRABISMO";*/
 
 		int acertadas=0;
 		int falladas=0;
@@ -69,26 +48,41 @@ namespace PracticaCaso
 		bool comienza;
 		string pregunta;
 		string solucion;
-		for (var = 0; var <= 4; ++var) {
+		for (var = 0; var < cant_letras; ++var) {
+
 			sqliteMapPasapalabra->get(letras[var], &comienza, &pregunta, &solucion);
+
+			if(comienza){
+				pregunta = "Comienza con la letra " + letras[var] + ": " + pregunta;
+			}else{
+				pregunta = "Contiene la letra " + letras[var] + ": " + pregunta;
+			}
 
 			(this->client)->send(solucion+"*"+pregunta);
 			string respuesta=(this->client)->receive();
+
 			if (!strcasecmp(solucion.c_str(), respuesta.c_str())){
+
 				solucion="RESPUESTA CORRECTA!!";
 				acertadas++;
+
 			}else{
+
 				solucion="";
 				falladas++;
 				string sol =respuestas[var].c_str();
 				solucion = "HAS FALLADO. La respuesta correcta era: "+sol+ ".";
+
 			}
+
 		}
+
 		stringstream stream,stream2;
 		stream << falladas;
 		stream2 << acertadas;
 		solucion="PREGUNTAS ACERTADAS: "+stream2.str()+" * PREGUNTAS FALLADAS: "+stream.str();
 		(this->client)->send("EL JUEGO HA ACABADO"+solucion);
 		(this->client)->close();
+
 	}
 }
