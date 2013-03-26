@@ -44,38 +44,41 @@ namespace PracticaCaso
 		int acertadas=0;
 		int falladas=0;
 		int var;
-		string aux = "";
 		bool comienza;
 		string pregunta;
-		string solucion;
+		string solucion = "";
+		string sol = "";
+		string acertado = "";
 		for (var = 0; var < cant_letras; ++var) {
 
 			sqliteMapPasapalabra->get(letras[var], &comienza, &pregunta, &solucion);
-
+			string envio = "";
 			if(comienza){
-				pregunta = "Comienza con la letra " + letras[var] + ": " + pregunta;
+				envio = "Comienza con la letra " + letras[var] + ": " + pregunta;
 			}else{
-				pregunta = "Contiene la letra " + letras[var] + ": " + pregunta;
+				envio = "Contiene la letra " + letras[var] + ": " + pregunta;
 			}
 
-			(this->client)->send(solucion+"*"+pregunta);
+			(this->client)->send(acertado+"*"+envio);
 			string respuesta=(this->client)->receive();
 
 			if (!strcasecmp(solucion.c_str(), respuesta.c_str())){
 
-				solucion="RESPUESTA CORRECTA!!";
+				acertado="RESPUESTA CORRECTA!!";
 				acertadas++;
 
 			}else{
 
-				solucion="";
 				falladas++;
-				string sol =respuestas[var].c_str();
-				solucion = "HAS FALLADO. La respuesta correcta era: "+sol+ ".";
+				string sol =solucion.c_str();
+				acertado = "HAS FALLADO. La respuesta correcta era: "+sol+ ".";
 
 			}
 
 		}
+
+		(this->client)->send(acertado);
+		(this->client)->receive();
 
 		stringstream stream,stream2;
 		stream << falladas;
