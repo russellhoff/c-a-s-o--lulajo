@@ -33,12 +33,8 @@ namespace PracticaCaso
 
 		string preguntas[cant_letras];
 		string respuestas[cant_letras];
-		string letras[cant_letras];
-		letras[0] = "A";
-		letras[1] = "B";
-		letras[2] = "C";
-		letras[3] = "D";
-		letras[4] = "E";
+		string letras[5] = {"a","b","c","d","e"};
+		//string letras[25] = {"a","b","c","d","e","f","g","h","i","j","k","l","m","n","ñ","o","p","q","r","s","t","u","v","w","x","y","z"};
 
 
 		int acertadas=0;
@@ -50,7 +46,6 @@ namespace PracticaCaso
 		string sol = "";
 		string acertado = "";
 		for (var = 0; var < cant_letras; ++var) {
-
 			sqliteMapPasapalabra->get(letras[var], &comienza, &pregunta, &solucion);
 			string envio = "";
 			if(comienza){

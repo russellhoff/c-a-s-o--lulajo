@@ -1,1 +1,7 @@
-Exception: STATUS_ACCESS_VIOLATION at eip=005B190F
+Exception: STATUS_ACCESS_VIOLATION at eip=6112A971
+eax=7EFACDA0 ebx=00000006 ecx=7EFAC96C edx=00000006 esi=20059228 edi=00000006
+ebp=7EFAC8A8 esp=7EFAC8A4 program=C:\cygwin\home\David\proyectoCaso\projectoCaso\dns\PasapalabraTcpListener.exe, pid 3896, thread unknown (0xCCC)
+cs=0023 ds=002B es=002B fs=0053 gs=002B ss=002B
+Stack trace:
+Frame     Function  Args
+End of stack trace

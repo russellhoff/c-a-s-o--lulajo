@@ -4,7 +4,7 @@
 #include "DsmServer.h"
 
 extern "C" {
-	#include </usr/include/signal.h>
+	#include <signal.h>
 }
 
 #define SPACES " \t\r\n"
@@ -45,13 +45,16 @@ inline string str(unsigned long num) {
 
 namespace PracticaCaso {
 	DsmServer::DsmServer(int p): nidCounter(-1), nodeCounter(0), TcpListener(p) {
-		// TODO: create lock 
+		// HECHO: create lock
+        pthread_rwlock_init( &this->accessLock, NULL );
 	}
 
 
 	DsmServer::~DsmServer() {
 		this->stop();
-		// TODO: destory lock
+		// HECHO: destory lock
+        pthread_rwlock_destroy( &this->accessLock);
+
 	}
 			
 	DsmNodeId DsmServer::dsm_init(TcpClient * dmsClient) {
@@ -66,6 +69,9 @@ namespace PracticaCaso {
 
 	void DsmServer::dsm_exit(DsmNodeId nodeId) {
 		// Remove all the data structures created by this node
+		//HECHO
+		pthread_rwlock_rdlock( &this->accessLock );
+
 		if (dsmNodeMap.find(nodeId) != dsmNodeMap.end()) {
 			--nodeCounter;
 			if (nodeCounter == 0) {

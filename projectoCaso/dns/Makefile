@@ -34,7 +34,7 @@ NameClient.o: NameClient.cc
 	$(CC) $(INCLUDE) -c NameClient.cc
 
 PasapalabraTcpListener: PasapalabraServerThread.o PasapalabraTcpListener.o
-	$(CC) PasapalabraServerThread.o PasapalabraTcpListener.o $(LDFLAGS) -o PasapalabraTcpListener
+	$(CC) PasapalabraServerThread.o PasapalabraTcpListener.o $(LDFLAGS) -lesideppalsqlite -o PasapalabraTcpListener
 
 PasapalabraTcpClient: PasapalabraTcpClient.o
 	$(CC) PasapalabraTcpClient.o $(LDFLAGS) -o PasapalabraTcpClient

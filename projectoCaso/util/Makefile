@@ -4,7 +4,7 @@
 CC=g++ -fPIC
 LDFLAGS=-shared -lm -lpthread 
 
-main: libesidesocket.so libesidethread.so libesidesh.so libesidesqlite.so
+main: libesidesocket.so libesidethread.so libesidesh.so libesidesqlite.so libesideppalsqlite.so
 
 
 libesidesocket.so: TcpListener.o
@@ -19,9 +19,17 @@ libesidesh.so: MySh.o popen.o
 	$(CC) $(LDFLAGS) MySh.o popen.o -o libesidesh.so
 	cp libesidesh.so libesidesh.dll
 	
+
+libesideppalsqlite.so: SQLiteMapPasapalabra.o
+	$(CC) $(LDFLAGS) SQLiteMapPasapalabra.o -lsqlite3 -o libesideppalsqlite.so
+	cp libesideppalsqlite.so libesideppalsqlite.dll
+	
 libesidesqlite.so: SQLiteMap.o
 	$(CC) $(LDFLAGS) SQLiteMap.o -lsqlite3 -o libesidesqlite.so
 	cp libesidesqlite.so libesidesqlite.dll
+	
+SQLiteMapPasapalabra.o: SQLiteMapPasapalabra.cc SQLiteMapPasapalabra.h
+	$(CC) -c SQLiteMapPasapalabra.cc	
 	
 SQLiteMap.o: SQLiteMap.cc SQLiteMap.h
 	$(CC) -c SQLiteMap.cc

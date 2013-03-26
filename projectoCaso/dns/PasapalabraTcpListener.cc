@@ -10,6 +10,10 @@ extern "C" {
 
 PracticaCaso::TcpListener * listener_pointer;
 
+void usage(){
+	cout << "./PasapalabraTcpListener pasapalabra_db" << endl;
+}
+
 void ctrl_c(int)
 {
     cout << "CTRL-C was pressed..." << endl;
@@ -18,6 +22,7 @@ void ctrl_c(int)
 
 
 int main() {
+
 	signal(SIGINT,ctrl_c);
 	PracticaCaso::TcpListener listener(4321);
 	listener_pointer = &listener;
@@ -26,10 +31,11 @@ int main() {
 
 	while (true) {
 		PracticaCaso::TcpClient* client = listener.acceptTcpClient();
-		PracticaCaso::PasapalabraServerThread* t = new PracticaCaso::PasapalabraServerThread(client);
+		PracticaCaso::PasapalabraServerThread* t = new PracticaCaso::PasapalabraServerThread(client,"pasapalabra_db.db");
 		t->start();
 	}
 
 	cout << "Finishing server ..." << endl;
 	listener.stop();
+
 }
