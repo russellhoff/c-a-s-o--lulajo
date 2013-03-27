@@ -86,6 +86,10 @@ namespace PracticaCaso {
 		// Incluir el lookup en el servidor de nombres para encontrar dirección IP y puerto de dmsServerName2Lookup 
 	}
 
+	DsmDriver::DsmDriver(string ipAddressNameServer, int portNameServer, string dmsServerName2Lookup){
+
+	}
+
 
 	DsmDriver::~DsmDriver() {
 		ostringstream outs;  // Declare an output string stream.
@@ -197,9 +201,11 @@ namespace PracticaCaso {
 				}
 			}
 			if (!blockPutEventReceived) {
-				// TODO: use binary semaphore initialized to 0 for conditional synchronisation
+				// DONE: use binary semaphore initialized to 0 for conditional synchronisation
 				// MODIFICACIÓN PRÁCTICA DSM: Seguir instrucciones de modificación 3.3.5.3
-				sleep(1);
+				pthread_mutex_lock(&this->mutex);
+				pthread_cond_wait(&this->condition,&this->mutex);
+				pthread_mutex_unlock(&this->mutex);
 			}
 		}
 	}
