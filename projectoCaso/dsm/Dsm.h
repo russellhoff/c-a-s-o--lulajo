@@ -20,8 +20,8 @@ extern "C" {
 
 #include <sstream>
 
-#include "Thread.h"
-#include "TcpListener.h"
+#include "../util/Thread.h"
+#include "../util/TcpListener.h"
 #include "DsmTypes.h"
 
 namespace PracticaCaso

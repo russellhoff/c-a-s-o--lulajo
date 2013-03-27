@@ -72,6 +72,7 @@ namespace PracticaCaso {
 	}
 	
 	
+	// MODIFICACI�N PR�CTICA DSM: descripci�n en 3.3.5 (punto 2):
 	// Nueva signature constructor: DsmDriver(string ipAddressNameServer, int portNameServer, string dmsServerName2Lookup); 
 	DsmDriver::DsmDriver(string DSMServerIPaddress, int DSMServerPort) {
 		// Lookup pop.deusto.es in NameServer
@@ -82,7 +83,6 @@ namespace PracticaCaso {
 		this->send("dsm_init");
 		this->nid = atoi((this->receive()).c_str());
 
-		// Incluir el lookup en el servidor de nombres para encontrar direcci�n IP y puerto de dmsServerName2Lookup 
 	}
 
 	DsmDriver::DsmDriver(string ipAddressNameServer, int portNameServer, string dmsServerName2Lookup){
@@ -152,26 +152,8 @@ namespace PracticaCaso {
 		this->send("dsm_init"); //send the message to initialize our Dsm Client.
 
 		string ans = this->receive(); //We will receive an answer from Dsm Server...
-
-		//Check if the connection was successful or no
-		/*if( ans.find("ERROR") == 0 ){
-			//An error occurred...
-			cout << "An error occurred while trying to connect to Dsm Server (address "
-					<< ipDmsServer << ":" << portDmsServer << "): " << ans << endl;
-			/*
-			 * Should we free the following (initialized before)?
-			 *
-			 * pthread_mutex_init(&this->mutex, NULL);
-			 * pthread_cond_init(&this->condition, NULL);
-			 *
-			 */
-
-		/*	this->observer->stop();
-			this->close();
-		}else{*/
-			//As the answer didn't contain any error, let's add the nid
-			this->nid = atoi(ans.c_str());
-		//}
+		//...which is the nid
+		this->nid = atoi(ans.c_str());
 
 	}
 
@@ -183,9 +165,6 @@ namespace PracticaCaso {
 		string exitOK = this->receive();
 		this->observer->stop();
 		this->close();
-
-		 pthread_mutex_destroy(&this->mutex);
-		 pthread_cond_destroy(&this->condition);
 	}
 
 	DsmNodeId DsmDriver::get_nid() {
@@ -276,9 +255,6 @@ namespace PracticaCaso {
 				}
 			}
 		}
-		pthread_mutex_lock(&this->mutex);
-		pthread_cond_signal(&this->condition);
-		pthread_mutex_unlock(&this->mutex);
 	}
 
 	void DsmDriver::dsm_wait(string blockId) {
