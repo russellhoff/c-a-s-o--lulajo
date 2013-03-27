@@ -154,7 +154,7 @@ namespace PracticaCaso {
 		string ans = this->receive(); //We will receive an answer from Dsm Server...
 
 		//Check if the connection was successful or no
-		if( ans.find("ERROR") == 0 ){
+		/*if( ans.find("ERROR") == 0 ){
 			//An error occurred...
 			cout << "An error occurred while trying to connect to Dsm Server (address "
 					<< ipDmsServer << ":" << portDmsServer << "): " << ans << endl;
@@ -166,12 +166,12 @@ namespace PracticaCaso {
 			 *
 			 */
 
-			this->observer->stop();
+		/*	this->observer->stop();
 			this->close();
-		}else{
+		}else{*/
 			//As the answer didn't contain any error, let's add the nid
 			this->nid = atoi(ans.c_str());
-		}
+		//}
 
 	}
 
@@ -284,13 +284,14 @@ namespace PracticaCaso {
 	void DsmDriver::dsm_wait(string blockId) {
 		bool blockPutEventReceived = false;
 		while (!blockPutEventReceived) {
-			for (vector<DsmEvent>::iterator it = this->putEvents.begin(); it!=this->putEvents.end(); ++it) {
+			for (vector<DsmEvent>::iterator it = this->putEvents.begin(); it != this->putEvents.end(); ++it) {
 				if ((it->cmd == "dsm_put") && (it->blockId == blockId)) {
 					blockPutEventReceived = true;
 					this->putEvents.erase(it);
 					break;
 				}
 			}
+
 			if (!blockPutEventReceived) {
 				// DONE: use binary semaphore initialized to 0 for conditional synchronisation
 				// MODIFICACI�N PR�CTICA DSM: Seguir instrucciones de modificaci�n 3.3.5.3
@@ -298,6 +299,7 @@ namespace PracticaCaso {
 				pthread_cond_wait(&this->condition,&this->mutex);
 				pthread_mutex_unlock(&this->mutex);
 			}
+
 		}
 	}
 
