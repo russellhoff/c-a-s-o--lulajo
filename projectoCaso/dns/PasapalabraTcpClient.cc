@@ -11,7 +11,9 @@ int main() {
 	PracticaCaso::TcpClient * client = new PracticaCaso::TcpClient();
 	client->connect("127.0.0.1", 4321);
 	cout << endl;
-	cout << "*************  BIENVENIDO A PASAPALABRA  *************" <<endl;
+	cout << "***********************  BIENVENIDO A PASAPALABRA  ***********************" <<endl;
+	cout << "--------------------------------------------------------------------------" <<endl;
+	cout << endl;
 	cout << "Se van a ofrecer varias definiciones y debes responder la palabra definida."<<endl;
 	bool acabado=false;
 	string mensaje;
@@ -32,11 +34,10 @@ int main() {
 	}
 	pregunta = client->receive();
 	int final=pregunta.find("EL JUEGO HA ACABADO");
-	cout << endl;
 	cout << pregunta.substr(0,final)<< endl;
 	cout << endl;
-	cout <<"------------- EL JUEGO HA ACABADO --------------"<< endl;
-	cout << endl;
+	cout << "**************************  EL JUEGO HA ACABADO ** ************************" <<endl;
+	cout << "---------------------------------------------------------------------------" <<endl;	cout << endl;
 
 	cout << pregunta.substr(final+19,pregunta.length()) << endl;
 

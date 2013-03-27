@@ -1,7 +1,6 @@
-Exception: STATUS_ACCESS_VIOLATION at eip=6112A971
-eax=7EFACDA0 ebx=00000006 ecx=7EFAC96C edx=00000006 esi=20059228 edi=00000006
-ebp=7EFAC8A8 esp=7EFAC8A4 program=C:\cygwin\home\David\proyectoCaso\projectoCaso\dns\PasapalabraTcpListener.exe, pid 3896, thread unknown (0xCCC)
-cs=0023 ds=002B es=002B fs=0053 gs=002B ss=002B
-Stack trace:
-Frame     Function  Args
-End of stack trace
+Exception: STATUS_ACCESS_VIOLATION at eip=0038190F
+      1 [unknown (0x8D0)] PasapalabraTcpListener 2296 exception::handle: Error while dumping state (probably corrupted stack)
+   1814 [unknown (0x8CC)] PasapalabraTcpListener 2296 exception::handle: Error while dumping state (probably corrupted stack)
+   7085 [unknown (0xD58)] PasapalabraTcpListener 2296 exception::handle: Error while dumping state (probably corrupted stack)
+   8774 [unknown (0x168)] PasapalabraTcpListener 2296 exception::handle: Error while dumping state (probably corrupted stack)
+   9883 [unknown (0xC7C)] PasapalabraTcpListener 2296 exception::handle: Error while dumping state (probably corrupted stack)
