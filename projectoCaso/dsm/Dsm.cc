@@ -72,7 +72,6 @@ namespace PracticaCaso {
 	}
 	
 	
-	// MODIFICACI�N PR�CTICA DSM: descripci�n en 3.3.5 (punto 2): 
 	// Nueva signature constructor: DsmDriver(string ipAddressNameServer, int portNameServer, string dmsServerName2Lookup); 
 	DsmDriver::DsmDriver(string DSMServerIPaddress, int DSMServerPort) {
 		// Lookup pop.deusto.es in NameServer
@@ -184,6 +183,9 @@ namespace PracticaCaso {
 		string exitOK = this->receive();
 		this->observer->stop();
 		this->close();
+
+		 pthread_mutex_destroy(&this->mutex);
+		 pthread_cond_destroy(&this->condition);
 	}
 
 	DsmNodeId DsmDriver::get_nid() {
@@ -274,6 +276,9 @@ namespace PracticaCaso {
 				}
 			}
 		}
+		pthread_mutex_lock(&this->mutex);
+		pthread_cond_signal(&this->condition);
+		pthread_mutex_unlock(&this->mutex);
 	}
 
 	void DsmDriver::dsm_wait(string blockId) {
