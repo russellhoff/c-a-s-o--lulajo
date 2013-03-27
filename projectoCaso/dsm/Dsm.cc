@@ -72,7 +72,7 @@ namespace PracticaCaso {
 	}
 	
 	
-	// MODIFICACIÓN PRÁCTICA DSM: descripción en 3.3.5 (punto 2): 
+	// MODIFICACIï¿½N PRï¿½CTICA DSM: descripciï¿½n en 3.3.5 (punto 2): 
 	// Nueva signature constructor: DsmDriver(string ipAddressNameServer, int portNameServer, string dmsServerName2Lookup); 
 	DsmDriver::DsmDriver(string DSMServerIPaddress, int DSMServerPort) {
 		// Lookup pop.deusto.es in NameServer
@@ -83,10 +83,96 @@ namespace PracticaCaso {
 		this->send("dsm_init");
 		this->nid = atoi((this->receive()).c_str());
 
-		// Incluir el lookup en el servidor de nombres para encontrar dirección IP y puerto de dmsServerName2Lookup 
+		// Incluir el lookup en el servidor de nombres para encontrar direcciï¿½n IP y puerto de dmsServerName2Lookup 
 	}
 
 	DsmDriver::DsmDriver(string ipAddressNameServer, int portNameServer, string dmsServerName2Lookup){
+
+		int portDmsServer;
+		string ipDmsServer, strPortDmsServer;
+
+		this->observer = new DsmObserver(this);
+		this->observer->start();
+
+		/*
+		 * Let's ask NameServer about Dms Server
+		 */
+		PracticaCaso::TcpClient *cli = new PracticaCaso::TcpClient(); //create TcpClient (we are a client of DnsServer)
+		cli->connect(ipAddressNameServer, portNameServer); //Connect to the DnsServer
+		cli->send(dmsServerName2Lookup); //Ask to DnsServer about Dms Server machine
+
+		string answerFromDnsServer = cli->receive(); //store the answer from Dns Server
+
+		/*
+		 * Let's test whether the Dns Server has sent us a valid address or,
+		 * unfortunately, it has sent us an error message
+		 */
+
+		if( answerFromDnsServer.find("ERROR") == 0 ){
+			cout << "The address " << dmsServerName2Lookup << " could not be resolved by DNS Server." << endl;
+			this->observer->stop();
+			this->close();
+		}else{
+			cout << "Dns Server resolved the address " << dmsServerName2Lookup << "! It corresponds to " << answerFromDnsServer << endl;
+
+			/*
+			 * Let's divide the answerFromDnsServer, as it containt the IP and Port
+			 * of Dms Server, we are gonna parse them: Ip as unique string and
+			 * Port as int.
+			 */
+			answerFromDnsServer = answerFromDnsServer.replace( //replace character ":" to " "
+					answerFromDnsServer.find(":", 0), //Index of first character (find first occurrence of ":")
+															//to replace.
+					1,								//Number of characters to be replaced.
+					" "								//replacing ":" to " "
+			);
+
+			istringstream ins;
+			ins.str( answerFromDnsServer );
+
+			/*
+			 * Let's split answerFromDnsServer's ip and port onto 2 strings:
+			 */
+			ins >> ipDmsServer >> strPortDmsServer;
+
+			portDmsServer = atoi( strPortDmsServer.c_str() ); //Parse port as string into port as int.
+
+			/*
+			 * Initialize vars for 3.3.5 (3)
+			 */
+			pthread_mutex_init(&this->mutex, NULL);
+			pthread_cond_init(&this->condition, NULL);
+		}
+		//Closing the connection to Dns Server
+		cli->close();
+
+		/*
+		 * Let's connecto to Dsm Server and add nid to us.
+		 */
+		this->connect(ipDmsServer, portDmsServer);
+		this->send("dsm_init"); //send the message to initialize our Dsm Client.
+
+		string ans = this->receive(); //We will receive an answer from Dsm Server...
+
+		//Check if the connection was successful or no
+		if( ans.find("ERROR") == 0 ){
+			//An error occurred...
+			cout << "An error occurred while trying to connect to Dsm Server (address "
+					<< ipDmsServer << ":" << portDmsServer << "): " << ans << endl;
+			/*
+			 * Should we free the following (initialized before)?
+			 *
+			 * pthread_mutex_init(&this->mutex, NULL);
+			 * pthread_cond_init(&this->condition, NULL);
+			 *
+			 */
+
+			this->observer->stop();
+			this->close();
+		}else{
+			//As the answer didn't contain any error, let's add the nid
+			this->nid = atoi(ans.c_str());
+		}
 
 	}
 
@@ -170,7 +256,7 @@ namespace PracticaCaso {
 
 
 	void DsmDriver::dsm_notify(string cmd, string blockId) {
-		// MODIFICACIÓN PRÁCTICA DSM: seguir indicaciones de 3.3.5 (punto 3)
+		// MODIFICACIï¿½N PRï¿½CTICA DSM: seguir indicaciones de 3.3.5 (punto 3)
 		cout << "***NOTIFICATION: " << cmd << " " << blockId << endl;
 		if (cmd == "dsm_put") {
 			// Add the new DsmEvent received
@@ -202,7 +288,7 @@ namespace PracticaCaso {
 			}
 			if (!blockPutEventReceived) {
 				// DONE: use binary semaphore initialized to 0 for conditional synchronisation
-				// MODIFICACIÓN PRÁCTICA DSM: Seguir instrucciones de modificación 3.3.5.3
+				// MODIFICACIï¿½N PRï¿½CTICA DSM: Seguir instrucciones de modificaciï¿½n 3.3.5.3
 				pthread_mutex_lock(&this->mutex);
 				pthread_cond_wait(&this->condition,&this->mutex);
 				pthread_mutex_unlock(&this->mutex);
