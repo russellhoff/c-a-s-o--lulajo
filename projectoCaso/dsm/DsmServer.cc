@@ -45,15 +45,17 @@ inline string str(unsigned long num) {
 
 namespace PracticaCaso {
 	DsmServer::DsmServer(int p): nidCounter(-1), nodeCounter(0), TcpListener(p) {
-		// HECHO: create lock
-        pthread_rwlock_init( &this->accessLock, NULL );
+		// DONE: create lock
+		// modification 4
+        pthread_rwlock_init( &this->lock, NULL );
 	}
 
 
 	DsmServer::~DsmServer() {
 		this->stop();
-		// HECHO: destory lock
-        pthread_rwlock_destroy( &this->accessLock);
+		// DONE: destory lock
+		// modification 4
+        pthread_rwlock_destroy( &this->lock);
 
 	}
 			
@@ -68,11 +70,14 @@ namespace PracticaCaso {
 	}
 
 	void DsmServer::dsm_exit(DsmNodeId nodeId) {
-		// Remove all the data structures created by this node
-		//HECHO
-		pthread_rwlock_rdlock( &this->accessLock );
+		// DONE: Remove all the data structures created by this node
+		// CREATE READ LOCK (MOD 4)
+		pthread_rwlock_rdlock( &this->lock );
 
 		if (dsmNodeMap.find(nodeId) != dsmNodeMap.end()) {
+			//FREE READ LOCK AND CREATE WRITE LOCK (MOD 4)
+			pthread_rwlock_unlock( &this->lock );
+			pthread_rwlock_wrlock( &this->lock );
 			--nodeCounter;
 			if (nodeCounter == 0) {
 				for (int i=0; i<dsmNodeMap[nodeId].dsmBlocksRequested.size(); i++) {
@@ -82,13 +87,25 @@ namespace PracticaCaso {
 				
 			}
 			dsmNodeMap.erase(nodeId);
+			// FREE WRITE LOCK (MOD 4)
+			pthread_rwlock_unlock( &this->lock );
+
+		}else{
+			// FREE READ LOCK IF NOT ENTER IN IF (MOD 4)
+			pthread_rwlock_unlock( &this->lock );
 		}
 	}
 	
 
 	void * DsmServer::dsm_malloc(DsmNodeId nid, string blockId, int size) {
+		// CREATE READ LOCK (MOD 4)
+		pthread_rwlock_rdlock( &this->lock );
 		if (this->dsmNodeMap.find(nid) != this->dsmNodeMap.end()) {
 			if (this->blockMetadataMap.find(blockId) == this->blockMetadataMap.end()) {
+				// FREE READ LOCK AND CREATE WRITE LOCK (MOD 4)
+				pthread_rwlock_unlock( &this->lock );
+				pthread_rwlock_wrlock( &this->lock );
+
 				DsmBlock block;
 				block.addr = malloc(size);
 				if (block.addr != NULL) {
@@ -106,9 +123,14 @@ namespace PracticaCaso {
 					cerr << "ERROR: DMS Server ran out of memory!!!" << endl;
 					return 0;
 				}
+				//FREE WRITE LOCK (MOD 4)
+				pthread_rwlock_unlock( &this->lock );
+
 			} else {
 				cerr << "WARNING: attempt to create block " << blockId << " already existing by " << nid << "!!!" << endl;
 				DsmBlock tempBlock = this->blockMetadataMap[blockId];
+				//FREE READ LOCK (MOD 4)
+				pthread_rwlock_unlock( &this->lock );
 				if (tempBlock.size < size) {
 					cerr << "ERROR: impossible to reuse block " << blockId << " of size " << tempBlock.size << " < " << size << endl;
 					return 0;
@@ -117,6 +139,8 @@ namespace PracticaCaso {
 				}
 			}
 		} else {
+			//FREE READ LOCK (MOD 4)
+			pthread_rwlock_unlock( &this->lock );
 			cerr << "ERROR: attempt to create block " << blockId << " by non-registered node " << nid << "!!!" << endl;
 			return 0;
 		}
@@ -124,22 +148,34 @@ namespace PracticaCaso {
 
 
 	bool DsmServer::dsm_put(DsmNodeId nid, string blockId, void * content, int size) {
+		//CREATE READ LOCK (MOD 4)
+		pthread_rwlock_rdlock( &this->lock );
 		if (this->blockMetadataMap.find(blockId) != this->blockMetadataMap.end()) {
+
 			bool dsmPutResult = false;
 			DsmBlock blockMetadata = this->blockMetadataMap[blockId];
 			// We allow anybody to write over the blocks
 			if ( size <= blockMetadata.blockSize ) {
+				//FREE READ LOCK AND CREATE WRITE ONE (MOD 4)
+				pthread_rwlock_unlock( &this->lock );
+				pthread_rwlock_wrlock( &this->lock );
 				bzero(blockMetadata.addr, blockMetadata.blockSize);
 				memcpy(blockMetadata.addr, content, size);
 				blockMetadata.size = size;
 				blockMetadata.lastAccessNode = nid;
 				this->blockMetadataMap[blockId] = blockMetadata;
 				dsmPutResult = true;
+				//FREE WRITE LOCK (MOD 4)
+				pthread_rwlock_unlock( &this->lock );
 			} else {
+				//FREE READ LOCK (MOD 4)
+				pthread_rwlock_unlock( &this->lock );
 				cerr << "ERROR: The node " << nid << " does not have write access!!!" << endl;
 			}
 			return dsmPutResult;
 		} else {
+			//FREE READ LOCK (MOD 4)
+			pthread_rwlock_unlock( &this->lock );
 			cerr << "ERROR: blockId " + blockId + " does not exist" << endl;
 			return false;
 		}
@@ -165,10 +201,16 @@ namespace PracticaCaso {
 	}
 
 	DsmBlock DsmServer::dsm_get(DsmNodeId nid, string blockId) {
+		//CREATE READ LOCK (MOD 4)
+		pthread_rwlock_rdlock( &this->lock );
 		if (this->blockMetadataMap.find(blockId) != this->blockMetadataMap.end()) {
 			DsmBlock temp = this->blockMetadataMap[blockId];
+			//FREE READ LOCK (MOD 4)
+			pthread_rwlock_unlock( &this->lock );
 			return temp;
 		} else {
+			//FREE READ LOCK (MOD 4)
+			pthread_rwlock_unlock( &this->lock );
 			DsmBlock block;
 			block.blockId = "ERROR";
 			return block;
@@ -177,12 +219,17 @@ namespace PracticaCaso {
 
 
 	bool DsmServer::dsm_free(DsmNodeId nid, string blockId) {
+		//CREATE READ LOCK (MOD 4)
+		pthread_rwlock_rdlock( &this->lock );
 		if (this->dsmNodeMap.find(nid) != this->dsmNodeMap.end()) {
 			DsmNodeMetadata nodeMetadata = this->dsmNodeMap[nid];
 			if (this->blockMetadataMap.find(blockId) != this->blockMetadataMap.end()) {
 				DsmBlock blockMetadata = this->blockMetadataMap[blockId];
 				// Only the last dsm client node who put some data can then release it
 				if (blockMetadata.lastAccessNode == nid) {
+					//FREE READ LOCK AND CREATE WRITE ONE (MOD 4)
+					pthread_rwlock_unlock( &this->lock );
+					pthread_rwlock_wrlock( &this->lock );
 					(this->blockMetadataMap).erase(blockId);
 					vector<DsmBlock> blocksRequested = (this->dsmNodeMap[nid]).dsmBlocksRequested;
 					for (vector<DsmBlock>::iterator it = blocksRequested.begin(); it!=blocksRequested.end(); ++it) {
@@ -195,12 +242,18 @@ namespace PracticaCaso {
 							return true;
 						}
 					}
+					//FREE WRITE LOCK (MOD 4)
+					pthread_rwlock_unlock( &this->lock );
 					return false;
 				} else {
+					//FREE READ LOCK (MOD 4)
+					pthread_rwlock_unlock( &this->lock );
 					return false;
 				}
 			}
 		} else {
+			//FREE READ LOCK (MOD 4)
+			pthread_rwlock_unlock( &this->lock );
 			return false;
 		}
 	}
