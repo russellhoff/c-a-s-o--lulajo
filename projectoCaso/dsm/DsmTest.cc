@@ -18,9 +18,9 @@ int main(int argc, char** argv) {
 		usage();
 	}
 
-	// Hacer lookup dsm.deusto.es 
+	int port=atoi(argv[1]);
+	PracticaCaso::DsmDriver * driver = new PracticaCaso::DsmDriver("127.0.0.1", port, "dsm.deusto.es");
 
-	PracticaCaso::DsmDriver * driver = new PracticaCaso::DsmDriver("127.0.0.1", atoi(argv[1]));
 	for (int i=0; i<10;i++) {
 		string blockId = "BlockA";
 
