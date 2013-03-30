@@ -52,4 +52,4 @@ clean:
 	rm *.o
 	rm *.so
 	rm *.dll
-	rm DsmServer DsmTest MatrixEvenAdder MatrixOddAdder 
+	rm DsmServer DsmTest MatrixEvenAdder MatrixOddAdder DsmTimeServer DsmTimeClient

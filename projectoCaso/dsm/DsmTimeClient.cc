@@ -1,6 +1,6 @@
 //MOD (6)
 //CLIENT IS GOING TO RECEIVE EACH SECOND A TIME FROM SERVER
-#include "TcpListener.h"
+#include "../util/TcpListener.h"
 #include "Dsm.h"
 
 #define BUFFER_SIZE 1024
@@ -35,7 +35,7 @@ int main(int argc, char** argv) {
             }
         }
         char* time2;
-        time = ((char *)time.addr);
+        time2 = ((char *)time.addr);
         cout << time2 << endl;
         //NOW WE WAIT 1 SECOND TO NEXT READING
         sleep(1);
