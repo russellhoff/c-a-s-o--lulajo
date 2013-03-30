@@ -35,9 +35,10 @@ namespace PracticaCaso
 			int nodeCounter;
 			map<DsmNodeId, DsmNodeMetadata> dsmNodeMap;
 			map<string, DsmBlock> blockMetadataMap; 
-			// DONE: declare variable of type pthread_rwlock_t
-			//variable of modification 4
-            pthread_rwlock_t lock;
+			// TODO: declare variable of type pthread_rwlock_t
+			//variable del evaluable 3.3.5(4)
+			pthread_rwlock_t rwlock;
+
 			void dsm_notify(string message);
 		public:
 			DsmServer(int port);

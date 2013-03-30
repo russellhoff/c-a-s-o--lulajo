@@ -4,7 +4,7 @@
 #include "DsmServer.h"
 
 extern "C" {
-	#include <signal.h>
+	#include </usr/include/signal.h>
 }
 
 #define SPACES " \t\r\n"
@@ -45,18 +45,16 @@ inline string str(unsigned long num) {
 
 namespace PracticaCaso {
 	DsmServer::DsmServer(int p): nidCounter(-1), nodeCounter(0), TcpListener(p) {
-		// DONE: create lock
-		// modification 4
-        pthread_rwlock_init( &this->lock, NULL );
+		//inicializamos la variable rwlock que hemos creado para el evaluable 3.3.5 (4)
+		pthread_rwlock_init(&this->rwlock, NULL);
 	}
 
 
 	DsmServer::~DsmServer() {
 		this->stop();
-		// DONE: destory lock
-		// modification 4
-        pthread_rwlock_destroy( &this->lock);
-
+		// TODO: destory lock
+		//destroy 3.3.5 (4)
+		pthread_rwlock_destroy(&this->rwlock);
 	}
 			
 	DsmNodeId DsmServer::dsm_init(TcpClient * dmsClient) {
@@ -69,15 +67,18 @@ namespace PracticaCaso {
 		return metadata.nid;
 	}
 
+	//PARA LA MODIFICACION 3.3.5 (4) BASICAMENTE LO QUE HAY QUE HACER ES QUE DIFERENTES NODOS/PROCESOS PUEDAN ACTUALIZAR BLOQUES COMPARTIDOS
+	//ADEMAS HAY QUE PERMITIR QUE TANTOS CLIENTES PUEDAN LEER LOS CONTENIDOS DE ESTOS BLOQUES
+	//PARA ELLO UTILIZAMOS UN READ/WRITE LOCK. EL HILO QUE ABRE EL LOCK ES EL QUE HA DE CERRARLO, ESTO NOS PROTEGE DE ESCRITURAS NO-CONCURRENTES
+	//ASIQUE IMPLEMENTAMOS ESTAS PROTECCIONES EN LOS METODOS QUE REALIZAN ESTE TIPO DE TAREAS
 	void DsmServer::dsm_exit(DsmNodeId nodeId) {
-		// DONE: Remove all the data structures created by this node
-		// CREATE READ LOCK (MOD 4)
-		pthread_rwlock_rdlock( &this->lock );
-
+		// Remove all the data structures created by this node
+		//abrimos el lock de lectura 3.3.5(4)
+		pthread_rwlock_rdlock(&this->rwlock);
 		if (dsmNodeMap.find(nodeId) != dsmNodeMap.end()) {
-			//FREE READ LOCK AND CREATE WRITE LOCK (MOD 4)
-			pthread_rwlock_unlock( &this->lock );
-			pthread_rwlock_wrlock( &this->lock );
+			//liberamos el lock de lectura y abrimos el de escritura 3.3.5 (4)
+			pthread_rwlock_unlock(&this->rwlock);
+			pthread_rwlock_wrlock(&this->rwlock);
 			--nodeCounter;
 			if (nodeCounter == 0) {
 				for (int i=0; i<dsmNodeMap[nodeId].dsmBlocksRequested.size(); i++) {
@@ -87,26 +88,27 @@ namespace PracticaCaso {
 				
 			}
 			dsmNodeMap.erase(nodeId);
-			// FREE WRITE LOCK (MOD 4)
-			pthread_rwlock_unlock( &this->lock );
-
+			//liberamos el lock de escritura 3.3.5 (4)
+			pthread_rwlock_unlock(&this->rwlock);
 		}else{
-			// FREE READ LOCK IF NOT ENTER IN IF (MOD 4)
-			pthread_rwlock_unlock( &this->lock );
+			//necesitamos un else para liberar el lock de lectura en cualquier caso(si el condicional no entra en el if)
+			//liberamos el lock(de lectura) 3.3.5 (4)
+			pthread_rwlock_unlock(&this->rwlock);
 		}
 	}
 	
 
 	void * DsmServer::dsm_malloc(DsmNodeId nid, string blockId, int size) {
-		// CREATE READ LOCK (MOD 4)
-		pthread_rwlock_rdlock( &this->lock );
+		//Lock de lectura 3.3.5 (4)
+
+		pthread_rwlock_rdlock(&this->rwlock);
 		if (this->dsmNodeMap.find(nid) != this->dsmNodeMap.end()) {
 			if (this->blockMetadataMap.find(blockId) == this->blockMetadataMap.end()) {
-				// FREE READ LOCK AND CREATE WRITE LOCK (MOD 4)
-				pthread_rwlock_unlock( &this->lock );
-				pthread_rwlock_wrlock( &this->lock );
-
+				//liberar lock de lecutra 3.3.5 (4)
+				pthread_rwlock_unlock(&this->rwlock);
 				DsmBlock block;
+				//Lock de escritura 3.3.5 (4)
+				pthread_rwlock_wrlock(&this->rwlock);
 				block.addr = malloc(size);
 				if (block.addr != NULL) {
 					block.blockSize = size;
@@ -114,23 +116,27 @@ namespace PracticaCaso {
 					block.creatorNode = nid;
 					block.lastAccessNode = nid;
 					this->blockMetadataMap[blockId] = block;
-
 					DsmNodeMetadata metadata = this->dsmNodeMap[nid];
 					metadata.dsmBlocksRequested.push_back(block);
-					this->dsmNodeMap[nid] = metadata;				
+					this->dsmNodeMap[nid] = metadata;
+
+				//liberar lock de escritura 3.3.5(4)
+				pthread_rwlock_unlock(&this->rwlock);
+
 					return block.addr;
+
 				} else {
 					cerr << "ERROR: DMS Server ran out of memory!!!" << endl;
 					return 0;
 				}
-				//FREE WRITE LOCK (MOD 4)
-				pthread_rwlock_unlock( &this->lock );
+
+
 
 			} else {
 				cerr << "WARNING: attempt to create block " << blockId << " already existing by " << nid << "!!!" << endl;
 				DsmBlock tempBlock = this->blockMetadataMap[blockId];
-				//FREE READ LOCK (MOD 4)
-				pthread_rwlock_unlock( &this->lock );
+				//liberar lock de lectura 3.3.5(4)
+				pthread_rwlock_unlock(&this->rwlock);
 				if (tempBlock.size < size) {
 					cerr << "ERROR: impossible to reuse block " << blockId << " of size " << tempBlock.size << " < " << size << endl;
 					return 0;
@@ -139,8 +145,8 @@ namespace PracticaCaso {
 				}
 			}
 		} else {
-			//FREE READ LOCK (MOD 4)
-			pthread_rwlock_unlock( &this->lock );
+			//liberar lock de lectura 3.3.5 (4)
+			pthread_rwlock_unlock(&this->rwlock);
 			cerr << "ERROR: attempt to create block " << blockId << " by non-registered node " << nid << "!!!" << endl;
 			return 0;
 		}
@@ -148,34 +154,44 @@ namespace PracticaCaso {
 
 
 	bool DsmServer::dsm_put(DsmNodeId nid, string blockId, void * content, int size) {
-		//CREATE READ LOCK (MOD 4)
-		pthread_rwlock_rdlock( &this->lock );
-		if (this->blockMetadataMap.find(blockId) != this->blockMetadataMap.end()) {
 
+		//Lock de lectura 3.3.5 (4)
+		pthread_rwlock_rdlock(&this->rwlock);
+		if (this->blockMetadataMap.find(blockId) != this->blockMetadataMap.end()) {
 			bool dsmPutResult = false;
 			DsmBlock blockMetadata = this->blockMetadataMap[blockId];
 			// We allow anybody to write over the blocks
 			if ( size <= blockMetadata.blockSize ) {
-				//FREE READ LOCK AND CREATE WRITE ONE (MOD 4)
-				pthread_rwlock_unlock( &this->lock );
-				pthread_rwlock_wrlock( &this->lock );
+
+				//liberar lock de lectura 3.3.5 (4)
+				pthread_rwlock_unlock(&this->rwlock);
+
+				//lock de escritura 3.3.5 (4)
+				pthread_rwlock_wrlock(&this->rwlock);
+
 				bzero(blockMetadata.addr, blockMetadata.blockSize);
 				memcpy(blockMetadata.addr, content, size);
 				blockMetadata.size = size;
 				blockMetadata.lastAccessNode = nid;
 				this->blockMetadataMap[blockId] = blockMetadata;
+
+				//liberar lock de escritura 3.3.5 (4)
+				pthread_rwlock_unlock(&this->rwlock);
+
 				dsmPutResult = true;
-				//FREE WRITE LOCK (MOD 4)
-				pthread_rwlock_unlock( &this->lock );
 			} else {
-				//FREE READ LOCK (MOD 4)
-				pthread_rwlock_unlock( &this->lock );
+
+				//liberar lock de lectura 3.3.5 (4)
+				pthread_rwlock_unlock(&this->rwlock);
+
 				cerr << "ERROR: The node " << nid << " does not have write access!!!" << endl;
 			}
 			return dsmPutResult;
 		} else {
-			//FREE READ LOCK (MOD 4)
-			pthread_rwlock_unlock( &this->lock );
+
+			//liberar lock de lectura 3.3.5 (4)
+			pthread_rwlock_unlock(&this->rwlock);
+
 			cerr << "ERROR: blockId " + blockId + " does not exist" << endl;
 			return false;
 		}
@@ -201,37 +217,51 @@ namespace PracticaCaso {
 	}
 
 	DsmBlock DsmServer::dsm_get(DsmNodeId nid, string blockId) {
-		//CREATE READ LOCK (MOD 4)
-		pthread_rwlock_rdlock( &this->lock );
+
+		//Lock de lectura 3.3.5 (4)
+		pthread_rwlock_rdlock(&this->rwlock);
 		if (this->blockMetadataMap.find(blockId) != this->blockMetadataMap.end()) {
 			DsmBlock temp = this->blockMetadataMap[blockId];
-			//FREE READ LOCK (MOD 4)
-			pthread_rwlock_unlock( &this->lock );
+
+			//liberar lock de lectura 3.3.5 (4)
+			pthread_rwlock_unlock(&this->rwlock);
+
 			return temp;
 		} else {
-			//FREE READ LOCK (MOD 4)
-			pthread_rwlock_unlock( &this->lock );
 			DsmBlock block;
 			block.blockId = "ERROR";
+
+			//liberar lock de lectura 3.3.5 (4)
+			pthread_rwlock_unlock(&this->rwlock);
+
 			return block;
 		}
 	}
 
-
+	//UNA DE LAS COSAS QUE SE NOS PIDEN EN EL 3.3.4 (4) ES QUE SOLO EL ULTIMO NODO QUE ACTUALIZO EL BLOQUE PUEDE LIBERARLO
+	//ESO LO IMPLEMENTAMOS AQUI, EN EL METODO FREE
 	bool DsmServer::dsm_free(DsmNodeId nid, string blockId) {
-		//CREATE READ LOCK (MOD 4)
-		pthread_rwlock_rdlock( &this->lock );
+
+		//Lock de lectura 3.3.5 (4)
+		pthread_rwlock_rdlock(&this->rwlock);
+
 		if (this->dsmNodeMap.find(nid) != this->dsmNodeMap.end()) {
 			DsmNodeMetadata nodeMetadata = this->dsmNodeMap[nid];
 			if (this->blockMetadataMap.find(blockId) != this->blockMetadataMap.end()) {
 				DsmBlock blockMetadata = this->blockMetadataMap[blockId];
-				// Only the last dsm client node who put some data can then release it
+
+				//el id del nodo que intenta liberarlo ha de coincidir con el del ultimo nodo que accedio al bloque
 				if (blockMetadata.lastAccessNode == nid) {
-					//FREE READ LOCK AND CREATE WRITE ONE (MOD 4)
-					pthread_rwlock_unlock( &this->lock );
-					pthread_rwlock_wrlock( &this->lock );
+
+					//liberar lock de lectura 3.3.5 (4)
+					pthread_rwlock_unlock(&this->rwlock);
+
+					//lock de escritura 3.3.5 (4)
+					pthread_rwlock_wrlock(&this->rwlock);
+
 					(this->blockMetadataMap).erase(blockId);
 					vector<DsmBlock> blocksRequested = (this->dsmNodeMap[nid]).dsmBlocksRequested;
+
 					for (vector<DsmBlock>::iterator it = blocksRequested.begin(); it!=blocksRequested.end(); ++it) {
 						if ( (blockMetadata.lastAccessNode == it->lastAccessNode) && 
 							 (blockMetadata.blockSize == it->blockSize) && 
@@ -239,21 +269,34 @@ namespace PracticaCaso {
 							) {
 							blocksRequested.erase(it, ++it);
 							(this->dsmNodeMap[nid]).dsmBlocksRequested = blocksRequested;
+							//liberar lock de escritura 3.3.5 (4) Write Unlock
+							pthread_rwlock_unlock(&this->rwlock);
 							return true;
 						}
 					}
-					//FREE WRITE LOCK (MOD 4)
-					pthread_rwlock_unlock( &this->lock );
+
+					//liberar lock de escritura 3.3.5 (4) Write Unlock
+					pthread_rwlock_unlock(&this->rwlock);
+
 					return false;
 				} else {
-					//FREE READ LOCK (MOD 4)
-					pthread_rwlock_unlock( &this->lock );
+
+					//liberar lock de lectura 3.3.5 (4)
+					pthread_rwlock_unlock(&this->rwlock);
+
 					return false;
 				}
 			}
+			else {
+
+				//liberar lock de lectura 3.3.5 (4)
+				pthread_rwlock_unlock(&this->rwlock);
+			}
 		} else {
-			//FREE READ LOCK (MOD 4)
-			pthread_rwlock_unlock( &this->lock );
+
+			//liberar lock de lectura 3.3.5 (4)
+			pthread_rwlock_unlock(&this->rwlock);
+
 			return false;
 		}
 	}
