@@ -14,3 +14,5 @@ eside.deusto.es 127.0.0.1:3000
 tecnologico.deusto.es 127.0.0.1:3001
 # direcciones de servidores superiores
 es 127.0.0.1:4000
+#direccion anyadida para dsm
+dsm.deusto.es 127.0.0.1:4444
