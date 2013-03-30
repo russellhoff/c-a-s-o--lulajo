@@ -1,5 +1,3 @@
-// DsmServer.h
-// author: dipina@eside.deusto.es
 #ifndef __DSM_H
 #define __DSM_H
 
@@ -35,9 +33,9 @@ namespace PracticaCaso
 			int nodeCounter;
 			map<DsmNodeId, DsmNodeMetadata> dsmNodeMap;
 			map<string, DsmBlock> blockMetadataMap; 
-			// TODO: declare variable of type pthread_rwlock_t
-			//variable del evaluable 3.3.5(4)
-			pthread_rwlock_t rwlock;
+
+			//variable of modification 4
+			pthread_rwlock_t lock;
 
 			void dsm_notify(string message);
 		public:

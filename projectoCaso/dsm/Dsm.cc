@@ -75,6 +75,9 @@ namespace PracticaCaso {
 	// MODIFICACI�N PR�CTICA DSM: descripci�n en 3.3.5 (punto 2):
 	// Nueva signature constructor: DsmDriver(string ipAddressNameServer, int portNameServer, string dmsServerName2Lookup); 
 	DsmDriver::DsmDriver(string DSMServerIPaddress, int DSMServerPort) {
+		//INITIALITE NEW VARIABLES
+		this->condition=NULL;
+		this->mutex=NULL;
 		// Lookup pop.deusto.es in NameServer
 		this->observer = new DsmObserver(this);
 		this->observer->start();
@@ -250,7 +253,7 @@ namespace PracticaCaso {
 				if ((it->cmd == "dsm_put") && (it->blockId == blockId)) {
 					// We should wipe out all the dsm_puts received for a block (problem when removing break)
 					this->putEvents.erase(it);
-					// TODO: not remove the break
+					// DONE: not remove the break
 					break;
 				}
 			}

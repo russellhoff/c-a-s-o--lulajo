@@ -58,7 +58,7 @@ int main(int argc, char** argv) {
 				
 			driver->dsm_free(blockId);
 			cout << i << ": releasing block: " << blockId << endl;
-		} catch (DsmException dsme) {
+		} catch (DsmException & dsme) {
 			cerr << dsme << endl;
 		}
 	}

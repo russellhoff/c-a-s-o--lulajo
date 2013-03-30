@@ -36,7 +36,7 @@ int main(int argc, char** argv) {
 			driver->dsm_free("Array100Nums");
 			exit(1);
 		}
-	} catch (DsmException dsme) {
+	} catch (DsmException & dsme) {
 		// There may be several processes doing a dsm_malloc, only the first one will succeed 
 		cerr << "ERROR in dsm_malloc(\"Array100Nums\", sizeof(" << sizeof(a) << ")): " << dsme << endl;
 		exit(1);
@@ -56,7 +56,7 @@ int main(int argc, char** argv) {
 		try {
 			data = driver->dsm_get("SumOddNums");
 			sumOddNumsGet = true;
-		} catch (DsmException dsme) {
+		} catch (DsmException & dsme) {
 			cerr << "ERROR: dsm_get(\"SumOddNums\") - Waiting for other process to initialise it: " << dsme << endl;
 			driver->dsm_wait("SumOddNums");
 		}
@@ -77,7 +77,7 @@ int main(int argc, char** argv) {
 			driver->dsm_free("Array100Nums");
 			exit(1);
 		}
-	} catch (DsmException dsme) {
+	} catch (DsmException & dsme) {
 		cerr << "ERROR in dsm_malloc(\"TotalSum\", sizeof(" << sizeof(totalSum) << ")): " << dsme << endl;
 		driver->dsm_free("Array100Nums");
 		exit(1);

@@ -29,7 +29,7 @@ int main(int argc, char** argv) {
 		try {
 			data = driver->dsm_get("Array100Nums");
 			array100NumsGet = true;
-		} catch (DsmException dsme) {
+		} catch (DsmException & dsme) {
 			cerr << "ERROR in dsm_get(\"Array100Nums\") - waiting for other process to initialize it: " << dsme << endl;
 			driver->dsm_wait("Array100Nums");
 		}
@@ -52,7 +52,7 @@ int main(int argc, char** argv) {
 			cerr << "ERROR: dsm_put(\"SumOddNums\", (void *)&sumOddNums, sizeof(sumOddNums))" << endl;
 			exit(1);
 		}
-	} catch (DsmException dsme) {
+	} catch (DsmException & dsme) {
 		cerr << "ERROR in dsm_malloc(\"SumOddNums\", sizeof(" << sizeof(sumOddNums) << ")): " << dsme << endl;
 		exit(1);
 	}
@@ -63,7 +63,7 @@ int main(int argc, char** argv) {
 		try {
 			data = driver->dsm_get("TotalSum");
 			totalSumGet = true;
-		} catch (DsmException dsme) {
+		} catch (DsmException & dsme) {
 			cerr << "ERROR in dsm_get(\"TotalSum\") - waiting for other process to initialize it: " << dsme << endl;
 			driver->dsm_wait("TotalSum");
 		}
