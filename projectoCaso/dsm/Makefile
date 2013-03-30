@@ -1,10 +1,8 @@
-# Makefile
-# author: dipina@eside.deusto.es
 CC=g++
 LDFLAGS=-L../util -lm -lpthread -lesidesocket -lesidethread
 INCLUDE=-I../util
 
-main: libesidedsm.so DsmServer DsmTest MatrixEvenAdder MatrixOddAdder 
+main: libesidedsm.so DsmServer DsmTest MatrixEvenAdder MatrixOddAdder DsmTimeServer DsmTimeClient
 
 libesidedsm.so: Dsm.o
 	$(CC) -shared $(LDFLAGS) Dsm.o -o libesidedsm.so
@@ -26,6 +24,12 @@ MatrixEvenAdder: MatrixEvenAdder.o
 MatrixOddAdder: MatrixOddAdder.o
 	$(CC) MatrixOddAdder.o $(LDFLAGS) -L. -lesidedsm -o MatrixOddAdder
 
+DsmTimeServer: DsmTimeServer.o
+	$(CC) DsmTimeServer.o -L. -lesidedsm $(LDFLAGS) -o DsmTimeServer
+	
+DsmTimeClient: DsmTimeClient.o
+	$(CC) DsmTimeClient.o -L. -lesidedsm $(LDFLAGS) -o DsmTimeClient
+
 DsmServer.o: DsmServer.cc DsmServer.h DsmTypes.h
 	$(CC) $(INCLUDE) -c DsmServer.cc
 
@@ -37,6 +41,12 @@ MatrixEvenAdder.o: MatrixEvenAdder.cc
 	
 MatrixOddAdder.o: MatrixOddAdder.cc
 	$(CC) $(INCLUDE) -c MatrixOddAdder.cc
+
+DsmTimeServer.o: DsmTimeServer.cc
+	$(CC) $(INCLUDE) -c DsmTimeServer.cc
+	
+DsmTimeClient.o: DsmTimeClient.cc
+	$(CC) $(INCLUDE) -c DsmTimeClient.cc
 
 clean:
 	rm *.o
