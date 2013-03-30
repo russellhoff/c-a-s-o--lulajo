@@ -101,20 +101,12 @@ namespace PracticaCaso {
 			return;
 		}
 
-		//cout << query << endl;
+		string str = result[7];
+		transform(str.begin(), str.end(), str.begin(), ::tolower);
+		istringstream is(str);
+		is >> std::boolalpha >> *comienza;
 
-		//string ret = "";
-
-		/*cout << "Identificador pregunta: " << result[5] << endl;
-		cout << "Letra de la pregunta: " << result[6] << endl;
-		cout << "Pregunta: " << result[8] << endl;
-		cout << "Respuesta a la pregunta: " << result[9] << endl;*/
-
-		if( result[7] == "true" )
-			*comienza = true;
-		else
-			*comienza = false;
-
+		cout << "Esto contiene si comienza o no?" << result[7] << endl;
 		*pregunta = result[8];
 		*respuesta = result[9];
 
@@ -153,7 +145,6 @@ namespace PracticaCaso {
 		return;
 
 	}
-
 
 	void SQLiteMapPasapalabra::close() {
 		sqlite3_close(dbh);

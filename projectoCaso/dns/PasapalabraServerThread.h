@@ -20,7 +20,6 @@ namespace PracticaCaso
 			PasapalabraServerThread(const PasapalabraServerThread&);
 			PasapalabraServerThread & operator = (const PasapalabraServerThread &);
 			~PasapalabraServerThread();
-			friend ostream & operator << (ostream &os, PasapalabraServerThread &n);
 	};
 };
 #endif

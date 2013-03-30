@@ -12,6 +12,11 @@ extern "C" {
 #include <string>
 #include <vector>
 #include <cstdlib>
+//para pasar de string a bool
+#include <sstream>
+#include <iomanip>
+#include <algorithm>
+#include <cctype>
 
 using namespace std;
 
@@ -28,7 +33,7 @@ namespace PracticaCaso
 			SQLiteMapPasapalabra(string fn);
 			SQLiteMapPasapalabra(const SQLiteMapPasapalabra&);
 			~SQLiteMapPasapalabra();
-			
+
 			/**
 			 * Obtiene una pregunta de una determinada letra (de todas las preguntas para esa letra,
 			 * obtiene una pregunta ALEATORIAMENTE)
