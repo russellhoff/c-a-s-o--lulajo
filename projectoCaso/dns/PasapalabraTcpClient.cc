@@ -21,7 +21,7 @@ int main() {
 	string solucion;
 	string respuesta;
 	int var;
-	for (var = 0; var <=27; ++var) {
+	for (var = 0; var <27; ++var) {
 		mensaje = client->receive();
 		pregunta = mensaje.substr(mensaje.find("*")+1, mensaje.length());
 		solucion = mensaje.substr(0,mensaje.find("*"));
