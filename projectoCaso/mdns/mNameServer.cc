@@ -177,6 +177,8 @@ namespace PracticaCaso {
 			// Three parameters: Command, Payload [dnsName or IpPort string], and random verification-code.
 			ins >> command >> payload >> code;
 			
+			this->client->mdns_management(command,payload,code);
+			cout << "After calling management" <<endl;
 		}	
 	}
 
@@ -237,8 +239,6 @@ namespace PracticaCaso {
 	}
 			
 	void mNameServer::mdns_manage_request(string cmd, string payload, string code) {
-		map<string, string>::iterator p;
-		string dnsValue;
 
 		// One MDNS_REQUEST received: you must lookup your table and answer or not.
 		// Lookup the local table. RFC doesn't recommend recursive looking up.
@@ -248,12 +248,12 @@ namespace PracticaCaso {
 		// It can be interesting to use a MDNS_ERROR RESPONSE, but with some overhead.
 
 		//COMPROBAMOS SI EL DNSNAME ESTA EN EL MAPA
-		map<string, string>::const_iterator iter;
-		iter = this->dns2IpPortMap.find(payload);
-		if (iter != this->dns2IpPortMap.end())	{
+		map<string, string>::iterator p;
+		p = this->dns2IpPortMap.find(payload);
+		if (p != this->dns2IpPortMap.end())	{
 			//EXISTE, ENVIAMOS RESPUESTA
 			ostringstream query;
-			query << MDNS_RESPONSE << " " << iter->second << " " << code;
+			query << MDNS_RESPONSE << " " << p->second << " " << code;
 			cout << "Sending  response: " << query.str() << " " << endl;
 			this->queryWrapper->send(query.str());
 		} else {
