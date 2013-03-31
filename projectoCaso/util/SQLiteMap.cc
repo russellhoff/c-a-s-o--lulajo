@@ -61,23 +61,20 @@ namespace PracticaCaso {
 		  sqlite3_free_table(result);
 		  return;
 
-		}
+		}else{
+			//cogemos los datos de la tabla
+			if (nrow ==0 && ncol==0) {
+				sqlite3_free_table(result);
+			} else {
+				//los datos de result los metemos en la cache ¿cabeceras?
+				for (int i=0; i <= nrow; i++) {
+					dns2IpPortMap[result[i*ncol]] = result[i*ncol + 1];
+				}
 
-		//cogemos los datos de la tabla
-		cout << "Loading data into cache" << endl;
-		if (sqlite3_get_table(dbh, "select * from KeyValuePair;", &result, &nrow, &ncol, &errorMsg) != SQLITE_OK) {
-			cerr << errorMsg << endl;
-			sqlite3_free(errorMsg);
-
+				//cerramos la BD
+				sqlite3_free_table(result);
+			}
 		}
-		cout << "llego" << endl;
-		//los datos de result los metemos en la cache ¿cabeceras?
-		for (int i=0; i <= nrow; i++) {
-			dns2IpPortMap[result[i*ncol]] = result[i*ncol + 1];
-		}
-
-		//cerramos la BD
-		sqlite3_free_table(result);
 	}
 
 	map<string, string> SQLiteMap::getMap() {
