@@ -14,8 +14,8 @@ extern "C" {
 
 namespace PracticaCaso {
 	mNameServer::mNameServer(int p, string m, bool leerCache): TcpListener(p) {
-		this->satisfiedQuery=NULL;
-		this->randSeed=NULL;
+		this->satisfiedQuery=false;
+		this->randSeed=0;
 		// Process the contents of the mapping file
 		this->sqliteMap = new SQLiteMap(m+"_cache.db");
 		this->leerCache = leerCache;
@@ -29,7 +29,7 @@ namespace PracticaCaso {
 	}
 
 	mNameServer::mNameServer(const mNameServer& ns): TcpListener(ns.port) {
-		satisfiedQuery=NULL;
+		satisfiedQuery=false;
 		observer=NULL;
 		queryWrapper=NULL;
 		domain = ns.domain;
