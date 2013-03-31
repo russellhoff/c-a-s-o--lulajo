@@ -34,8 +34,7 @@ namespace PracticaCaso {
 		cout << "Opening BD ..." << endl;
 		if (sqlite3_open(mappingsDBFileName.c_str(), &dbh) != SQLITE_OK) {
 			cerr << sqlite3_errmsg(dbh) << endl;
-			sqlite3_close(dbh);
-			exit(1);
+			this->close();
 		}
 		// <-- HASTA AQUÍ
 
