@@ -11,16 +11,18 @@ extern "C" {
 }
 
 void usage() { 
-	cout << "Usage: DsmTimeServer <name-server-port>" << endl;
+	cout << "Usage: DsmTimeServer <name-server-port> <dsm-domain>" << endl;
 	exit(1);
 }
 
 int main(int argc, char** argv) {
-	if (argc > 2) {
+	if (argc > 3) {
 		usage(); 
 	}
 	int port =atoi(argv[1]);
-	PracticaCaso::DsmDriver * driver = new PracticaCaso::DsmDriver("127.0.0.1", port, "dsm.deusto.es");
+	char * domain =argv[2];
+
+	PracticaCaso::DsmDriver * driver = new PracticaCaso::DsmDriver("127.0.0.1", port, domain);
 
 	char buffer[100];
 	struct timeval tv;
@@ -29,7 +31,7 @@ int main(int argc, char** argv) {
     try {
         driver->dsm_malloc("GLOBAL_TIMESTAMP", sizeof(buffer));
     } catch (DsmException & dsme) {
-        cerr << "ERROR in dsm_malloc(\"GLOBAL_TIMESTAMP\", sizeof(" << sizeof(buffer) << ")): " << dsme << endl;
+        cerr << "ERROR: dsm_malloc(\"GLOBAL_TIMESTAMP\"): " << dsme << endl;
         exit(1);
     }
 
@@ -42,7 +44,7 @@ int main(int argc, char** argv) {
         	//PUTTING TIME INTO VARIABLE GLOBAL_TIMESTAMP
             driver->dsm_put("GLOBAL_TIMESTAMP", (void *)buffer, sizeof(buffer));
         } catch (DsmException & dsme) {
-            cerr << "ERROR: dsm_put(\"GLOBAL_TIMESTAMP\", buffer, " << sizeof(buffer) << ")): " << dsme << endl;
+            cerr << "ERROR: dsm_put(\"GLOBAL_TIMESTAMP\"): " << dsme << endl;
             driver->dsm_free("GLOBAL_TIMESTAMP");
             exit(1); 
         } 
