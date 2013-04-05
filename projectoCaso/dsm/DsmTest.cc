@@ -1,7 +1,7 @@
 // DsmTest.cc
 // author: dipina@eside.deusto.es
 
-#include "TcpListener.h"
+#include "../util/TcpListener.h"
 #include "Dsm.h"
 
 #define BUFFER_SIZE 1024

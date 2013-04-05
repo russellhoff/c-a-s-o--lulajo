@@ -2,6 +2,8 @@
 // author: dipina@eside.deusto.es
 
 #include "Dsm.h"
+#include "Thread.h"
+#include "TcpListener.h"
 #define BUFFER_SIZE 1024
 
 namespace PracticaCaso {
@@ -74,10 +76,17 @@ namespace PracticaCaso {
 	
 	// MODIFICACI�N PR�CTICA DSM: descripci�n en 3.3.5 (punto 2):
 	// Nueva signature constructor: DsmDriver(string ipAddressNameServer, int portNameServer, string dmsServerName2Lookup); 
-	DsmDriver::DsmDriver(string DSMServerIPaddress, int DSMServerPort) {
-		//INITIALITE NEW VARIABLES
-		this->condition=NULL;
-		this->mutex=NULL;
+	//DsmDriver::DsmDriver(string DSMServerIPaddress, int DSMServerPort) {
+		//INITIALIZE NEW VARIABLES
+		/* this->condition=NULL;
+		 * This is the right way to initialize pthread_cond_t variable:
+		 */
+	/*	pthread_cond_init(&this->condition, NULL);
+		/* this->mutex=NULL;
+		 * The right way to pthread__mutex_t
+		 */
+	/*	pthread_mutex_init(&this->mutex, NULL);
+
 		// Lookup pop.deusto.es in NameServer
 		this->observer = new DsmObserver(this);
 		this->observer->start();
@@ -86,12 +95,14 @@ namespace PracticaCaso {
 		this->send("dsm_init");
 		this->nid = atoi((this->receive()).c_str());
 
-	}
+	}*/
 
-	DsmDriver::DsmDriver(string ipAddressNameServer, int portNameServer, string dmsServerName2Lookup){
+	DsmDriver::DsmDriver(string ipAddressNameServer, int portNameServer, string dsmServerName2Lookup){
 
 		int portDmsServer;
 		string ipDmsServer, strPortDmsServer;
+
+
 
 		this->observer = new DsmObserver(this);
 		this->observer->start();
@@ -101,21 +112,21 @@ namespace PracticaCaso {
 		 */
 		PracticaCaso::TcpClient *cli = new PracticaCaso::TcpClient(); //create TcpClient (we are a client of DnsServer)
 		cli->connect(ipAddressNameServer, portNameServer); //Connect to the DnsServer
-		cli->send(dmsServerName2Lookup); //Ask to DnsServer about Dms Server machine
+		cli->send(dsmServerName2Lookup); //Ask to DnsServer about Dms Server machine
 
 		string answerFromDnsServer = cli->receive(); //store the answer from Dns Server
-
+		cout << "***Respuesta al resolver " << ipAddressNameServer << " con el puerto " << portNameServer << ":::: " << answerFromDnsServer << endl;
 		/*
 		 * Let's test whether the Dns Server has sent us a valid address or,
 		 * unfortunately, it has sent us an error message
 		 */
 
 		if( answerFromDnsServer.find("ERROR") == 0 ){
-			cout << "The address " << dmsServerName2Lookup << " could not be resolved by DNS Server." << endl;
+			cerr << "The address " << dsmServerName2Lookup << " could not be resolved by DNS Server." << answerFromDnsServer << endl;
 			this->observer->stop();
 			this->close();
 		}else{
-			cout << "Dns Server resolved the address " << dmsServerName2Lookup << "! It corresponds to " << answerFromDnsServer << endl;
+			cout << "Dns Server resolved the address " << dsmServerName2Lookup << "! It corresponds to " << answerFromDnsServer << endl;
 
 			/*
 			 * Let's divide the answerFromDnsServer, as it containt the IP and Port
@@ -126,7 +137,7 @@ namespace PracticaCaso {
 					answerFromDnsServer.find(":", 0), //Index of first character (find first occurrence of ":")
 															//to replace.
 					1,								//Number of characters to be replaced.
-					" "								//replacing ":" to " "
+					" "								//replacing ":" with " "
 			);
 
 			istringstream ins;
@@ -158,6 +169,16 @@ namespace PracticaCaso {
 		//...which is the nid
 		this->nid = atoi(ans.c_str());
 
+		//ADDED FROM THE OTHER CONSTRUCTOR: INITIALIZE NEW VARIABLES
+		/* this->condition=NULL;
+		 * This is the right way to initialize pthread_cond_t variable:
+		 */
+		pthread_cond_init(&condition, NULL);
+		/* this->mutex=NULL;
+		 * The right way to pthread__mutex_t
+		 */
+		pthread_mutex_init(&mutex, NULL);
+
 	}
 
 
@@ -168,6 +189,8 @@ namespace PracticaCaso {
 		string exitOK = this->receive();
 		this->observer->stop();
 		this->close();
+		pthread_cond_init(&condition, NULL);
+		pthread_mutex_init(&mutex, NULL);
 	}
 
 	DsmNodeId DsmDriver::get_nid() {
@@ -258,9 +281,13 @@ namespace PracticaCaso {
 				}
 			}
 		}
+		pthread_cond_signal(&condition);
 	}
 
 	void DsmDriver::dsm_wait(string blockId) {
+
+		pthread_mutex_lock(&mutex);
+
 		bool blockPutEventReceived = false;
 		while (!blockPutEventReceived) {
 			for (vector<DsmEvent>::iterator it = this->putEvents.begin(); it != this->putEvents.end(); ++it) {
@@ -274,9 +301,9 @@ namespace PracticaCaso {
 			if (!blockPutEventReceived) {
 				// DONE: use binary semaphore initialized to 0 for conditional synchronisation
 				// MODIFICACI�N PR�CTICA DSM: Seguir instrucciones de modificaci�n 3.3.5.3
-				pthread_mutex_lock(&this->mutex);
+				//pthread_mutex_lock(&this->mutex);
 				pthread_cond_wait(&this->condition,&this->mutex);
-				pthread_mutex_unlock(&this->mutex);
+				//pthread_mutex_unlock(&this->mutex);
 			}
 
 		}

@@ -35,7 +35,7 @@ void printRecursosDisponibles(char * resources){
 
 
 
-bool existsResource(char * resources, char * resource){
+/*bool existsResource(char * resources, char * resource){
 
 	bool enc = false;
 	cout << "El recurso a comprobar es:" << resource << endl;
@@ -54,7 +54,7 @@ bool existsResource(char * resources, char * resource){
 
 	return enc;
 
-}
+}*/
 
 int main(int argc, char** argv) {
 
@@ -74,7 +74,7 @@ int main(int argc, char** argv) {
 
 	int nid = driver->get_nid();
 
-	string _REC_ = "RESOURCES";
+	//string _REC_ = "RESOURCES";
 
 	/*
 	 * El string resources no se puede actualizar (dsm_free) por otro nodo que no sea el que lo creo.
@@ -90,7 +90,7 @@ int main(int argc, char** argv) {
 	/*
 	 * Ahora trataremos de adivinar cual es el ultimo resources creado:
 	 */
-	string jj = "RESOURCES";
+	/*string jj = "RESOURCES";
 	int num = 0;
 	do {
 
@@ -106,7 +106,7 @@ int main(int argc, char** argv) {
 		num = num - 1;
 	string ultimoResources = "RESOURCES" + static_cast<ostringstream*>( &(ostringstream() << num) )->str();
 
-	cout << "El ultimo string de RESOURCES se llama: " << ultimoResources << endl;
+	cout << "El ultimo string de RESOURCES se llama: " << ultimoResources << endl;*/
 
 	/*
 	 * Fin de adivinar el ultimo string de RESOURCES
@@ -114,7 +114,8 @@ int main(int argc, char** argv) {
 	if( act!="get" && act!="put" /*&& act!="list_resources"*/){
 		//cout << "+++Mostrando usage()... Action: " << action << endl;
 		usage();
-	}else{
+		exit(1);
+	}//else{
 		/*
 		 * There will be a resources string, which will contain every resource name separated by a ';'. This
 		 * string is named "RESOURCES"
@@ -126,7 +127,7 @@ int main(int argc, char** argv) {
 		 *
 		 */
 		//cout << "Hacer resources..." << endl;
-		char * resources;
+//		char * resources;
 
 		/*try {
 			cout << "Try..." << endl;
@@ -136,7 +137,7 @@ int main(int argc, char** argv) {
 			cout << "Tras pillar resources..." << endl;
 			cout << "Resources string already initialized." << endl;
 		} catch (DsmException dsme) {*/
-		if(ultimoResources == "RESOURCES0"){
+/*		if(ultimoResources == "RESOURCES0"){
 			cout << "Resources string is NOT initialized. Trying to initialize it... " << endl;
 
 			resources = "recurso-vacio;";
@@ -151,9 +152,9 @@ int main(int argc, char** argv) {
 				exit(1);
 			}
 
-		}
+		}*/
 
-	}
+//	}
 
 	cout << "Client successfully created with nid \'" << nid << "\' in order to " << action << " data." << endl;
 
@@ -165,7 +166,7 @@ int main(int argc, char** argv) {
 		if( argc == 6){
 
 			/*
-			 * TODO
+			 * DONE
 			 */
 
 			char * rec = argv[4];

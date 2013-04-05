@@ -7,19 +7,19 @@
 #define BUFFER_SIZE 1024
 
 void usage() {
-	cout << "Usage: MatrixEvenAdder <dsm-server-port>" << endl;
+	cout << "Usage: MatrixEvenAdder <dns-server-port> <dsm-server-name>" << endl;
 	exit(1);
 }
 
 
 int main(int argc, char** argv) {
 
-	if (argc != 2) {
+	if (argc != 3) {
 		usage();
 	}
 
 	// Hacer lookup dsm.deusto.es 
-	PracticaCaso::DsmDriver * driver = new PracticaCaso::DsmDriver("127.0.0.1", atoi(argv[1]));
+	PracticaCaso::DsmDriver * driver = new PracticaCaso::DsmDriver("127.0.0.1", atoi(argv[1]), argv[2]);
 	PracticaCaso::DsmData data;
 	cout << "Adding array of 100 nums from 0 to 99: " << driver->get_nid() << endl;
 
@@ -57,7 +57,7 @@ int main(int argc, char** argv) {
 			data = driver->dsm_get("SumOddNums");
 			sumOddNumsGet = true;
 		} catch (DsmException & dsme) {
-			cerr << "ERROR: dsm_get(\"SumOddNums\") - Waiting for other process to initialise it: " << dsme << endl;
+			cerr << "ERROR: dsm_get(\"SumOddNums\") - Waiting for other process to initialize it: " << dsme << endl;
 			driver->dsm_wait("SumOddNums");
 		}
 	} 

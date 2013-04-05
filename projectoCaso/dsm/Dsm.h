@@ -20,8 +20,8 @@ extern "C" {
 
 #include <sstream>
 
-#include "../util/Thread.h"
-#include "../util/TcpListener.h"
+#include "Thread.h"
+#include "TcpListener.h"
 #include "DsmTypes.h"
 
 namespace PracticaCaso
@@ -54,7 +54,7 @@ namespace PracticaCaso
 			pthread_cond_t condition;
 			pthread_mutex_t mutex;
 		public:
-			DsmDriver(string DSMServerIPaddress, int DSMServerPort);
+			//OLD: //DsmDriver(string DSMServerIPaddress, int DSMServerPort);
 			DsmDriver(string ipAddressNameServer, int portNameServer, string dmsServerName2Lookup);
 
 			~DsmDriver();
