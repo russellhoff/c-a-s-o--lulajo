@@ -12,7 +12,6 @@ extern "C" {
 #include <string>
 #include <vector>
 #include <cstdlib>
-//para pasar de string a bool
 #include <sstream>
 #include <iomanip>
 #include <algorithm>

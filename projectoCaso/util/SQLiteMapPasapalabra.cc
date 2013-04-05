@@ -58,20 +58,6 @@ namespace PracticaCaso {
 
 		}
 
-		//cogemos los datos de la tabla
-		/*cout << "Loading data into cache" << endl;
-		if (sqlite3_get_table(dbh, "select * from PreguntasPasapalabra;", &result, &nrow, &ncol, &errorMsg) != SQLITE_OK) {
-			cerr << errorMsg << endl;
-			sqlite3_free(errorMsg);
-
-		}
-		cout << "llego" << endl;
-		//imprimimos los datos
-		for (int i=0; i <= nrow; i++) {
-			//dns2IpPortMap[result[i*ncol]] = result[i*ncol + 1];
-			cout << "Fila num. " << i << ": " << result[i+ncol + 1] << endl;
-		}*/
-
 		//cerramos la BD
 		sqlite3_free_table(result);
 	}
