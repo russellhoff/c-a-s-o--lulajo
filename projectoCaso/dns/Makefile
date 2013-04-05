@@ -1,6 +1,6 @@
 # Makefile
 # author: dipina@eside.deusto.es
-CC=g++
+CC=g++ -fPIC
 LDFLAGS=-L../util -lm -lpthread -lesidesocket -lesidethread 
 INCLUDE=-I../util
 
