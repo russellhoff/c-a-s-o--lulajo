@@ -220,7 +220,7 @@ int main(int argc, char** argv) {
 					}
 
 
-				}catch(DsmException dsme){
+				}catch(DsmException & dsme){
 					cerr << "Exception: " << dsme << endl;
 				}
 
@@ -362,7 +362,7 @@ int main(int argc, char** argv) {
 
 
 
-			}catch(DsmException dsme){
+			}catch(DsmException & dsme){
 				cerr << "Exception: " << dsme << endl;
 			}
 
@@ -374,7 +374,7 @@ int main(int argc, char** argv) {
 
 	}/*else if( act=="list_resources"){
 		/*
-		 * HECHO. TODO: si recursos es vacio, mostrar un texto.
+		 * HECHO. si recursos es vacio, mostrar un texto.
 		 */
 	/*	cout << "Vamos a listar todos los recursos disponibles" << endl;
 

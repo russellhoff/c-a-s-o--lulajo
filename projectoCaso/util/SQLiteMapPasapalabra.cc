@@ -66,7 +66,7 @@ namespace PracticaCaso {
 	 * Esta funcion devolvera un par aleatorio de pregunta/respuesta dada una letra.
 	 */
 	void SQLiteMapPasapalabra::get(string letra, bool *comienza, string *pregunta, string *respuesta) {
-		cout << "Opening BD ..." << endl;
+		cout << "Opening BD to look for a question" << endl;
 		if (sqlite3_open(fileName.c_str(), &dbh) != SQLITE_OK) {
 			cerr << sqlite3_errmsg(dbh) << endl;
 			sqlite3_close(dbh);
@@ -92,7 +92,7 @@ namespace PracticaCaso {
 		istringstream is(str);
 		is >> std::boolalpha >> *comienza;
 
-		cout << "Esto contiene si comienza o no?" << result[7] << endl;
+		//cout << "Esto contiene si comienza o no?" << result[7] << endl;
 		*pregunta = result[8];
 		*respuesta = result[9];
 

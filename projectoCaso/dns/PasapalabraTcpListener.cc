@@ -12,7 +12,7 @@ extern "C" {
 PracticaCaso::TcpListener * listener_pointer;
 
 void usage(){
-	cout << "./PasapalabraTcpListener pasapalabra_db" << endl;
+	cout << "./PasapalabraTcpListener" << endl;
 }
 
 void ctrl_c(int)

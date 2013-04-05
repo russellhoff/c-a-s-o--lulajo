@@ -47,12 +47,11 @@ namespace PracticaCaso
 			string envio = "";
 
 			if(comienza){
-				cout << "****comienza"<< endl;
 				envio = "Comienza con la letra " + letras[var] + ": " + pregunta;
 			}else{
-				cout << "****contiene"<< endl;
 				envio = "Contiene la letra " + letras[var] + ": " + pregunta;
 			}
+			cout << "**Sending a question to client..."<< endl;
 
 			(this->client)->send(acertado+"*"+envio);
 			string respuesta=(this->client)->receive();
