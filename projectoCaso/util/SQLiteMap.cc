@@ -99,9 +99,6 @@ namespace PracticaCaso {
 						sqlite3_free(errorMsg);
 						sqlite3_close(dbh);
 						exit(1);
-				}else{
-					cout << "ok. " << endl;
-
 				}
 
 				cout << "Row updated." << endl;
@@ -121,10 +118,6 @@ namespace PracticaCaso {
 				sqlite3_free(errorMsg);
 				sqlite3_close(dbh);
 				exit(1);
-		}else{
-			cout << "ok2. " << endl;
-
-
 		}
 
 		cout << "Row created. " << endl;

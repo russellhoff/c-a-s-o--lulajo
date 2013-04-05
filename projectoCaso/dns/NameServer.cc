@@ -201,7 +201,7 @@ void ctrl_c(int)
 
 
 void usage() {
-	cout << "Usage: NameServer <port> <name-mappings-file>" << endl;
+	cout << "Usage: NameServer <port> <name-mappings-file> <read_from_cache_flag>" << endl;
 	exit(1);
 }
 
@@ -222,13 +222,14 @@ int main(int argc, char** argv) {
 	if (argc != 3 && argc !=4)
 		usage();
 
-	bool leerCache =true;
+	bool leerCache = true;
 	if(argc == 4){
+		cout << "ENTRO1"<<endl;
 		if(string(argv[3]) == "false")
 			leerCache=false;
-	} else{
-		if(string(argv[3]) == "true")
+		else if(string(argv[3]) == "true")
 			leerCache=true;
+		else usage();
 	}
 
 	PracticaCaso::NameServer nameServer(atoi(argv[1]), (string)argv[2], leerCache);
