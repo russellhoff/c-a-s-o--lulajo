@@ -224,7 +224,6 @@ int main(int argc, char** argv) {
 
 	bool leerCache = true;
 	if(argc == 4){
-		cout << "ENTRO1"<<endl;
 		if(string(argv[3]) == "false")
 			leerCache=false;
 		else if(string(argv[3]) == "true")

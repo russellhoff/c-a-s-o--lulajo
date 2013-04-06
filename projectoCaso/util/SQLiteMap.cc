@@ -93,12 +93,9 @@ namespace PracticaCaso {
 
 		if (dns2IpPortMap.find(mapKey) != dns2IpPortMap.end()) {
 				if (sqlite3_get_table(dbh, query.c_str(), &result, &nrow, &ncol, &errorMsg) != SQLITE_OK) {
-					cout << "fallo1" << endl;
-
-						cerr << errorMsg << endl;
-						sqlite3_free(errorMsg);
-						sqlite3_close(dbh);
-						exit(1);
+					cerr << errorMsg << endl;
+					sqlite3_free(errorMsg);
+					this->close();
 				}
 
 				cout << "Row updated." << endl;
@@ -106,18 +103,13 @@ namespace PracticaCaso {
 				return;
 		}
 
-
 		dns2IpPortMap[mapKey]= mapValue;
 		query = "insert into KeyValuePair values('" + mapKey + "', '" + mapValue + "')";
 
 		if (sqlite3_get_table(dbh, query.c_str(), &result, &nrow, &ncol, &errorMsg) != SQLITE_OK) {
-			//falla aquí xq no existe la tabla
-			cout << "fallo2" << endl;
-
-				cerr << errorMsg << endl;
-				sqlite3_free(errorMsg);
-				sqlite3_close(dbh);
-				exit(1);
+			cerr << errorMsg << endl;
+			sqlite3_free(errorMsg);
+			this->close();
 		}
 
 		cout << "Row created. " << endl;
@@ -127,6 +119,7 @@ namespace PracticaCaso {
 
 	void SQLiteMap::close() {
 		sqlite3_close(dbh);
+		exit(1);
 	}
 
 	ostream & operator << (ostream & os, SQLiteMap &t) {

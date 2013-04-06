@@ -30,8 +30,7 @@ namespace PracticaCaso {
 		cout << "Opening BD ..." << endl;
 		if (sqlite3_open(mappingsDBFileName.c_str(), &dbh) != SQLITE_OK) {
 			cerr << sqlite3_errmsg(dbh) << endl;
-			sqlite3_close(dbh);
-			exit(1);
+			this->close();
 		}
 
 		char **result;
@@ -69,8 +68,7 @@ namespace PracticaCaso {
 		cout << "Opening BD to look for a question" << endl;
 		if (sqlite3_open(fileName.c_str(), &dbh) != SQLITE_OK) {
 			cerr << sqlite3_errmsg(dbh) << endl;
-			sqlite3_close(dbh);
-			exit(1);
+			this->close();
 		}
 
 		char **result;
@@ -92,7 +90,7 @@ namespace PracticaCaso {
 		istringstream is(str);
 		is >> std::boolalpha >> *comienza;
 
-		//cout << "Esto contiene si comienza o no?" << result[7] << endl;
+		//cout << "Esto contiene si comienza o contiene!" << result[7] << endl;
 		*pregunta = result[8];
 		*respuesta = result[9];
 
@@ -116,14 +114,11 @@ namespace PracticaCaso {
 		string query = "INSERT INTO PreguntasPasapalabra(id, suletra, comienza, pregunta, respuesta) VALUES (NULL, "+letra+", "+auxComienza+", "+pregunta+", "+respuesta+")";
 
 		if (sqlite3_get_table(dbh, query.c_str(), &result, &nrow, &ncol, &errorMsg) != SQLITE_OK) {
-			cout << "fallo1" << endl;
 			cerr << errorMsg << endl;
 			sqlite3_free(errorMsg);
-			sqlite3_close(dbh);
-			exit(1);
+			this->close();
 		}else{
 			cout << "Datos insertados. " << endl;
-
 		}
 
 		cout << "Datos insertados." << endl;
@@ -134,6 +129,7 @@ namespace PracticaCaso {
 
 	void SQLiteMapPasapalabra::close() {
 		sqlite3_close(dbh);
+		exit(1);
 	}
 
 	ostream & operator << (ostream & os, SQLiteMapPasapalabra &t) {
