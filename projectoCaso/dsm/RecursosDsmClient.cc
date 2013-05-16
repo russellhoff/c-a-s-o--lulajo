@@ -1,18 +1,17 @@
 #include "TcpListener.h"
 #include "Dsm.h"
 #include <string.h>
-#include <string>
+#include <stdio.h>
 
 #define BUFFER_SIZE 1024
 
 void usage() {
 	cout << "Usage: RecursosDsmClient <name-server-port> <dsm-domain> <action-to-do> <...>" << endl;
 	cout << "<action-to-do> options: "
-		 << "\n\t1) [not implemented] list_resources : prints the available resources within the DSM Server."
-		 << "\n\t2) get <resource-name> <resource-passphrase> - In order to fetch some data in the DSM Server. "
+		 << "\n\t1) get <resource-name> <resource-passphrase> - In order to fetch some data in the DSM Server. "
 		 << "\n\t\t\t\t<resource-name> : name of the resource to fetch."
 		 << "\n\t\t\t\t<resource-passphrase> : resource\'s passphrase."
-		 << "\n\t3) put <resource-name> <resource-passphrase> - In order to put some data in the DSM Server. "
+		 << "\n\t2) put <resource-name> <resource-passphrase> - In order to put some data in the DSM Server. "
 		 << "\n\t\t\t\t<resource-name> : name of the resource to put."
 		 << "\n\t\t\t\t<resource-passphrase> : resource\'s passphrase."
 		 << endl;
@@ -65,7 +64,7 @@ int main(int argc, char** argv) {
 					recursoInfo = ((char *)dataResource.addr);
 					string recursoInfoStr = string(recursoInfo);
 
-					cout << "Vamos a pillar el recurso " << recStr << " con el secreto " << secretStr << endl;
+					//cout << "Vamos a pillar el recurso " << recStr << " con el secreto " << secretStr << endl;
 
 					char * recursoSecret;
 					try{
@@ -75,13 +74,12 @@ int main(int argc, char** argv) {
 						auxGetResourcePass = auxGetResourcePass + "_passphrase";
 						//cout << "Vamos a pillar este bloque: " << auxGetResourcePass << endl;
 						dataResourcePass = driver->dsm_get(auxGetResourcePass);
-
 						recursoSecret = ((char *)dataResourcePass.addr);
-
-						if( recursoSecret == secretStr ){
+						//cout << "Secreto length: " << strlen(recursoSecret) << endl;
+						if( strcmp(recursoSecret, secretStr.c_str() )){
 							//Secret is correct!
 							cout << "Secret valid for \'" << rec << "\'!" << endl;
-							cout << "Resource \'" << rec << "\': " << recursoInfoStr << endl;
+							cout << "Resource \'" << rec << "\': " << recursoInfoStr.substr(0,recursoInfoStr.size()) << endl;
 						}else{
 							//Secret is not valid!
 
@@ -111,15 +109,12 @@ int main(int argc, char** argv) {
 			 * DONE
 			 */
 
-
 			char * rec = argv[4];
 			string recStr = string(rec);
 			char * secret = argv[5];
 			string secretStr = string(secret);
 
-
 			try{
-
 
 				cout << "Now type your info, please: " << endl;
 
@@ -129,25 +124,26 @@ int main(int argc, char** argv) {
 				fflush(stdin);
 
 				getline(cin, input);
-
 				char * inputInCharStar = (char *) input.c_str();
+				cout <<"EL CONTENIDO ES: "<< inputInCharStar <<endl;
 
-				driver->dsm_malloc(rec, strlen(inputInCharStar));
+				driver->dsm_malloc(rec, input.size());
 
 				try {
-					driver->dsm_put(rec, (void *)inputInCharStar, strlen(inputInCharStar));
+					driver->dsm_put(rec, (void *)inputInCharStar, input.size());
 
 					char * recPasshraseAux;
 					recPasshraseAux = rec;
 
 					strcat(recPasshraseAux,"_passphrase");
 					try{
-
+						//cout << "Size of the allocated space: " << secretStr.size() << " - the char * size: " << strlen(secret) << endl;
 						driver->dsm_malloc(recPasshraseAux, secretStr.size());
 
 						try {
-							driver->dsm_put(recPasshraseAux, (void *)secretStr.c_str(), secretStr.size());
-							//cout << "Fin!! Se ha introducido la info... con contrasenya: " << secretStr << endl;
+							driver->dsm_put(recPasshraseAux, (void *)secret, secretStr.size());
+							cout << "Resource introduced properly" << endl;
+							//cout << "Fin!! Se ha introducido el recurso " << recStr << " la info "<< inputInCharStar << "... con contrasenya: " << secretStr << endl;
 						} catch (DsmException dsme) {
 							cerr << "ERROR: dsm_put(\"" << recPasshraseAux << "\", a, " << strlen(secret) << ")): " << dsme << endl;
 							driver->dsm_free(rec);
@@ -172,8 +168,6 @@ int main(int argc, char** argv) {
 			}catch(DsmException & dsme){
 				cerr << "Exception: " << dsme << endl;
 			}
-
-
 
 		}else{
 			usage();
