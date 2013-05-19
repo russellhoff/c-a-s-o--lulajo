@@ -41,7 +41,7 @@ int main(int argc, char** argv) {
 		usage();
 		exit(1);
 	}
-	cout << "Client successfully created with nid \'" << nid << "\' in order to " << action << " data." << endl;
+	//cout << "Client successfully created with nid \'" << nid << "\' in order to " << action << " data." << endl;
 
 	if( act=="get"){
 
@@ -52,31 +52,27 @@ int main(int argc, char** argv) {
 			 */
 
 			char * rec = argv[4];
-			string recStr = string(rec);
+			string name = string(rec);
 			char * secret = argv[5];
-			string secretStr = string(secret);
+			string pass = string(secret);
 
-				char * recursoInfo;
+				char * contenido;
 				try{
-					dataResource = driver->dsm_get(recStr);
+					dataResource = driver->dsm_get(name);
 
 
-					recursoInfo = ((char *)dataResource.addr);
-					string recursoInfoStr = string(recursoInfo);
-
-					//cout << "Vamos a pillar el recurso " << recStr << " con el secreto " << secretStr << endl;
+					contenido = ((char *)dataResource.addr);
+					string recursoInfoStr = string(contenido);
+					recursoInfoStr=recursoInfoStr.substr(0,dataResource.size);
 
 					char * recursoSecret;
 					try{
-						string auxGetResourcePass;
-						//cout << "****Contrasenya a poner: " << secretStr << endl;
-						auxGetResourcePass = recStr;
-						auxGetResourcePass = auxGetResourcePass + "_passphrase";
-						//cout << "Vamos a pillar este bloque: " << auxGetResourcePass << endl;
+						string auxGetResourcePass = name + "_passphrase";
 						dataResourcePass = driver->dsm_get(auxGetResourcePass);
 						recursoSecret = ((char *)dataResourcePass.addr);
-						//cout << "Secreto length: " << strlen(recursoSecret) << endl;
-						if( strcmp(recursoSecret, secretStr.c_str() )){
+						string passStr = string(recursoSecret);
+						passStr=passStr.substr(0,dataResourcePass.size);
+						if( !passStr.compare( pass.c_str()) ){
 							//Secret is correct!
 							cout << "Secret valid for \'" << rec << "\'!" << endl;
 							cout << "Resource \'" << rec << "\': " << recursoInfoStr.substr(0,recursoInfoStr.size()) << endl;
@@ -116,7 +112,7 @@ int main(int argc, char** argv) {
 
 			try{
 
-				cout << "Now type your info, please: " << endl;
+				cout << "Now type your info, please: " ;
 
 				/**/
 				string input;
@@ -125,7 +121,6 @@ int main(int argc, char** argv) {
 
 				getline(cin, input);
 				char * inputInCharStar = (char *) input.c_str();
-				cout <<"EL CONTENIDO ES: "<< inputInCharStar <<endl;
 
 				driver->dsm_malloc(rec, input.size());
 
